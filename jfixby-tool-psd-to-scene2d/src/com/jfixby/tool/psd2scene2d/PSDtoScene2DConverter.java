@@ -223,6 +223,9 @@ public class PSDtoScene2DConverter {
 				LayerElement raster_element = new LayerElement();
 				convertRaster(child, raster_element, naming, result, scale_factor);
 				output.children.addElement(raster_element);
+				
+				raster_element.position_x = 0;
+				raster_element.position_y = 0;
 
 				PSDRaster raster = child.getRaster();
 				output.position_x = raster.getPosition().getX() * scale_factor;
