@@ -678,6 +678,11 @@ public class PSDtoScene2DConverter {
 		if (output.name.startsWith("@")) {
 			throw new Error("Bad layer name: " + output.name);
 		}
+		
+		if (input.getName().startsWith("area_touch1")) {
+			L.d();
+		}
+
 
 		output.is_raster = true;
 		output.position_x = position.getX() * scale_factor;
