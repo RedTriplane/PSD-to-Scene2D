@@ -22,6 +22,7 @@ public class TAGS {
 	public static final String PADDING = "@padding=";
 	public static final String TYPE = "@type=";
 	public static final String TEXT = "@text";
+	public static final String R3_SHADER = "@r3.shader";
 	public static final String FONT = "@font";
 	public static final String BUTTON = "button";
 	public static final String AREA = "@area";
@@ -42,5 +43,6 @@ public class TAGS {
 
 	// public static final String ANIMATION_TYPE_SEQUENCE = "sequence";
 	public static final String SCALE_DIVISOR = "@scale_divisor=";
+	public static final String RADIUS = "@radius";
 
 }
