@@ -45,4 +45,9 @@ public class PsdRepackerNameResolver implements ChildAssetsNameResolver {
 		return package_name.child("text").child(child_id);
 	}
 
+	@Override
+	public AssetID childShader(String child_id) {
+		return package_name.child("shader").child(child_id);
+	}
+
 }

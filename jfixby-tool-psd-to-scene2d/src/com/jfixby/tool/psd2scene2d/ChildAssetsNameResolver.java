@@ -17,4 +17,6 @@ public interface ChildAssetsNameResolver {
 
 	AssetID childText(String child_id);
 
+	AssetID childShader(String child_id);
+
 }

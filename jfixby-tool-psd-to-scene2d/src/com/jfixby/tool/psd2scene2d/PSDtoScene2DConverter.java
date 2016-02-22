@@ -339,10 +339,11 @@ public class PSDtoScene2DConverter {
 				throw new Error("Missing tag <@" + TAGS.ID + ">");
 			} else {
 				String id_string = readParameter(id_layer.getName(), TAGS.ID);
-				output.shader_settings.shader_asset_id = id_string;
-				AssetID id = naming.childText(id_string);
-				output.shader_id = id.toString();
-				result.addRequiredAsset(Names.newAssetID(id_string), Collections.newList(input));
+				output.shader_id = id_string;
+
+				AssetID shader_id = naming.childShader(id_string);
+				output.shader_settings.shader_asset_id = shader_id.toString();
+				result.addRequiredAsset(shader_id, Collections.newList(input));
 			}
 		}
 
