@@ -124,7 +124,7 @@ public class PSDtoScene2DConverter {
 			PSDLayer animation_node = input.findChildByNamePrefix(TAGS.ANIMATION);
 			PSDLayer childscene_node = input.findChildByNamePrefix(TAGS.CHILD_SCENE);
 			PSDLayer text_node = input.findChildByNamePrefix(TAGS.R3_TEXT);
-			PSDLayer shader_node = input.findChildByNamePrefix(TAGS.R3_SHADER);
+
 			PSDLayer user_input = input.findChildByNamePrefix(TAGS.INPUT);
 			// PSDLayer events_node = input.findChild(EVENT);
 			if (animation_node != null) {
@@ -139,12 +139,13 @@ public class PSDtoScene2DConverter {
 							"Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
 				convertChildScene(input, output, naming, result, scale_factor);
-			} else if (shader_node != null) {
-				if (input.numberOfChildren() != 1) {
-					throw new Error(
-							"Annotation problem (only one child allowed). This is not an child scene node: " + input);
-				}
-				convertShader(input, output, naming, result, scale_factor);
+				// } else if (shader_node != null) {
+				// if (input.numberOfChildren() != 1) {
+				// throw new Error(
+				// "Annotation problem (only one child allowed). This is not an
+				// child scene node: " + input);
+				// }
+				// convertShader(input, output, naming, result, scale_factor);
 			} else if (text_node != null) {
 				if (input.numberOfChildren() != 1) {
 					throw new Error(
@@ -321,71 +322,71 @@ public class PSDtoScene2DConverter {
 		}
 	}
 
-	private static void convertShader(PSDLayer input_parent, LayerElement output, ChildAssetsNameResolver naming,
+	private static void convertFolder(PSDLayer input, LayerElement coutput, ChildAssetsNameResolver naming,
 			SceneStructurePackingResult result, double scale_factor) {
 
-		String name = input_parent.getName();
-		output.is_hidden = !input_parent.isVisible();
-		output.is_shader = true;
-		output.name = name;
+		PSDLayer shader_node = input.findChildByNamePrefix(TAGS.R3_SHADER);
+		ShaderSettings shader_settings = null;
+		if (shader_node != null) {
+			shader_settings = new ShaderSettings();
 
-		output.shader_settings = new ShaderSettings();
+			shader_settings.is_hidden = !shader_node.isVisible();
 
-		PSDLayer input = input_parent.findChildByNamePrefix(TAGS.R3_SHADER);
-
-		{
-			PSDLayer id_layer = findChild(TAGS.ID, input);
-			if (id_layer == null) {
-				throw new Error("Missing tag <@" + TAGS.ID + ">");
-			} else {
-				String id_string = readParameter(id_layer.getName(), TAGS.ID);
-				output.shader_id = id_string;
-
-				AssetID shader_id = naming.childShader(id_string);
-				output.shader_settings.shader_asset_id = shader_id.toString();
-				result.addRequiredAsset(shader_id, Collections.newList(input));
-			}
-		}
-
-		{
-
-			PSDLayer origin = input.findChildByNamePrefix(TAGS.ORIGIN);
-			if (origin != null) {
-				double shader_x = origin.getRaster().getPosition().getX() * scale_factor;
-				double shader_y = origin.getRaster().getPosition().getY() * scale_factor;
-				ShaderParameter canvas_x = new ShaderParameter(SHADER_PARAMETERS.POSITION_X, "" + shader_x);
-				ShaderParameter canvas_y = new ShaderParameter(SHADER_PARAMETERS.POSITION_Y, "" + shader_y);
-
-				output.shader_settings.params.addElement(canvas_x);
-				output.shader_settings.params.addElement(canvas_y);
-
-				PSDLayer radius = input.findChildByNamePrefix(TAGS.RADIUS);
-				if (radius != null) {
-					double rx = radius.getRaster().getPosition().getX() * scale_factor;
-					double ry = radius.getRaster().getPosition().getY() * scale_factor;
-					double shader_radius = FloatMath.distance(shader_x, shader_y, rx, ry);
-
-					ShaderParameter radius_p = new ShaderParameter(SHADER_PARAMETERS.RADIUS, "" + shader_radius);
-
-					output.shader_settings.params.addElement(radius_p);
-
+			{
+				PSDLayer id_layer = findChild(TAGS.ID, shader_node);
+				if (id_layer == null) {
+					throw new Error("Missing tag <@" + TAGS.ID + ">");
 				} else {
-					Err.reportError("Shader radius not found: " + input);
+					String id_string = readParameter(id_layer.getName(), TAGS.ID);
+					shader_settings.shader_name = id_string;
+
+					AssetID shader_id = naming.childShader(id_string);
+					shader_settings.shader_asset_id = shader_id.toString();
+					result.addRequiredAsset(shader_id, Collections.newList(shader_node));
 				}
 			}
+
+			{
+
+				PSDLayer origin = shader_node.findChildByNamePrefix(TAGS.ORIGIN);
+				if (origin != null) {
+					double shader_x = origin.getRaster().getPosition().getX() * scale_factor;
+					double shader_y = origin.getRaster().getPosition().getY() * scale_factor;
+					ShaderParameter canvas_x = new ShaderParameter(SHADER_PARAMETERS.POSITION_X, "" + shader_x);
+					ShaderParameter canvas_y = new ShaderParameter(SHADER_PARAMETERS.POSITION_Y, "" + shader_y);
+
+					shader_settings.params.addElement(canvas_x);
+					shader_settings.params.addElement(canvas_y);
+
+					PSDLayer radius = shader_node.findChildByNamePrefix(TAGS.RADIUS);
+					if (radius != null) {
+						double rx = radius.getRaster().getPosition().getX() * scale_factor;
+						double ry = radius.getRaster().getPosition().getY() * scale_factor;
+						double shader_radius = FloatMath.distance(shader_x, shader_y, rx, ry);
+
+						ShaderParameter radius_p = new ShaderParameter(SHADER_PARAMETERS.RADIUS, "" + shader_radius);
+
+						shader_settings.params.addElement(radius_p);
+
+					} else {
+						Err.reportError("Shader radius not found: " + shader_node);
+					}
+				}
+			}
+
 		}
-
-	}
-
-	private static void convertFolder(PSDLayer input, LayerElement output, ChildAssetsNameResolver naming,
-			SceneStructurePackingResult result, double scale_factor) {
-
+		LayerElement output = coutput;
+		output.shader_settings = shader_settings;
 		output.is_hidden = !input.isVisible();
 		output.name = input.getName();
 
 		output.is_sublayer = true;
+
 		for (int i = 0; i < input.numberOfChildren(); i++) {
 			PSDLayer child = input.getChild(i);
+			if (shader_node != null && shader_node == child) {
+				continue;
+			}
 			LayerElement element = new LayerElement();
 			output.children.addElement(element);
 			convert(child, element, naming, result, scale_factor);
@@ -763,9 +764,9 @@ public class PSDtoScene2DConverter {
 			throw new Error("Bad layer name: " + output.name);
 		}
 
-		if (input.getName().startsWith("area_touch1")) {
-			L.d();
-		}
+//		if (input.getName().startsWith("area_touch1")) {
+//			L.d();
+//		}
 
 		output.is_raster = true;
 		output.position_x = position.getX() * scale_factor;
