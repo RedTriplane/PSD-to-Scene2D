@@ -28,6 +28,7 @@ import com.jfixby.r3.ext.api.scene2d.srlz.LayerElement;
 import com.jfixby.r3.ext.api.scene2d.srlz.Scene2DPackage;
 import com.jfixby.r3.ext.api.scene2d.srlz.SceneStructure;
 import com.jfixby.r3.ext.api.scene2d.srlz.ShaderParameter;
+import com.jfixby.r3.ext.api.scene2d.srlz.ShaderParameterType;
 import com.jfixby.r3.ext.api.scene2d.srlz.ShaderSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.TextSettings;
 
@@ -352,8 +353,10 @@ public class PSDtoScene2DConverter {
 				if (origin != null) {
 					double shader_x = origin.getRaster().getPosition().getX() * scale_factor;
 					double shader_y = origin.getRaster().getPosition().getY() * scale_factor;
-					ShaderParameter canvas_x = new ShaderParameter(SHADER_PARAMETERS.POSITION_X, "" + shader_x);
-					ShaderParameter canvas_y = new ShaderParameter(SHADER_PARAMETERS.POSITION_Y, "" + shader_y);
+					ShaderParameter canvas_x = new ShaderParameter(SHADER_PARAMETERS.POSITION_X, "" + shader_x,
+							ShaderParameterType.FLOAT);
+					ShaderParameter canvas_y = new ShaderParameter(SHADER_PARAMETERS.POSITION_Y, "" + shader_y,
+							ShaderParameterType.FLOAT);
 
 					shader_settings.params.addElement(canvas_x);
 					shader_settings.params.addElement(canvas_y);
@@ -364,7 +367,8 @@ public class PSDtoScene2DConverter {
 						double ry = radius.getRaster().getPosition().getY() * scale_factor;
 						double shader_radius = FloatMath.distance(shader_x, shader_y, rx, ry);
 
-						ShaderParameter radius_p = new ShaderParameter(SHADER_PARAMETERS.RADIUS, "" + shader_radius);
+						ShaderParameter radius_p = new ShaderParameter(SHADER_PARAMETERS.RADIUS, "" + shader_radius,
+								ShaderParameterType.FLOAT);
 
 						shader_settings.params.addElement(radius_p);
 
@@ -764,9 +768,9 @@ public class PSDtoScene2DConverter {
 			throw new Error("Bad layer name: " + output.name);
 		}
 
-//		if (input.getName().startsWith("area_touch1")) {
-//			L.d();
-//		}
+		// if (input.getName().startsWith("area_touch1")) {
+		// L.d();
+		// }
 
 		output.is_raster = true;
 		output.position_x = position.getX() * scale_factor;
