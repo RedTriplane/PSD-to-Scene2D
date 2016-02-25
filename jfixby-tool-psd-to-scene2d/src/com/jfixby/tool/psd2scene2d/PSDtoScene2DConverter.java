@@ -16,7 +16,7 @@ import com.jfixby.cmns.api.math.FloatMath;
 import com.jfixby.psd.unpacker.api.PSDLayer;
 import com.jfixby.psd.unpacker.api.PSDRaster;
 import com.jfixby.psd.unpacker.api.PSDRasterPosition;
-import com.jfixby.r3.api.shader.SHADER_PARAMETERS;
+import com.jfixby.r3.api.shader.srlz.SHADER_PARAMETERS;
 import com.jfixby.r3.ext.api.scene2d.srlz.Action;
 import com.jfixby.r3.ext.api.scene2d.srlz.ActionsGroup;
 import com.jfixby.r3.ext.api.scene2d.srlz.Anchor;
@@ -379,24 +379,26 @@ public class PSDtoScene2DConverter {
 			}
 
 		}
-		LayerElement output = coutput;
-		output.shader_settings = shader_settings;
-		output.is_hidden = !input.isVisible();
-		output.name = input.getName();
+		{
+			LayerElement output = coutput;
+			// output.shader_settings = shader_settings;
+			output.is_hidden = !input.isVisible();
+			output.name = input.getName();
 
-		output.is_sublayer = true;
+			output.is_sublayer = true;
 
-		for (int i = 0; i < input.numberOfChildren(); i++) {
-			PSDLayer child = input.getChild(i);
-			if (shader_node != null && shader_node == child) {
-				continue;
-			}
-			LayerElement element = new LayerElement();
-			output.children.addElement(element);
-			convert(child, element, naming, result, scale_factor);
+			for (int i = 0; i < input.numberOfChildren(); i++) {
+				PSDLayer child = input.getChild(i);
+				if (shader_node != null && shader_node == child) {
+					continue;
+				}
+				LayerElement element = new LayerElement();
+				output.children.addElement(element);
+				convert(child, element, naming, result, scale_factor);
 
-			if (element.name.startsWith("@")) {
-				throw new Error("Bad layer name: " + element.name);
+				if (element.name.startsWith("@")) {
+					throw new Error("Bad layer name: " + element.name);
+				}
 			}
 		}
 	}
