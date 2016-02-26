@@ -8,15 +8,12 @@ import com.jfixby.cmns.api.collections.Collections;
 import com.jfixby.cmns.api.collections.List;
 import com.jfixby.cmns.api.collections.Map;
 import com.jfixby.cmns.api.debug.Debug;
-import com.jfixby.cmns.api.err.Err;
 import com.jfixby.cmns.api.floatn.Float2;
 import com.jfixby.cmns.api.geometry.Geometry;
 import com.jfixby.cmns.api.log.L;
-import com.jfixby.cmns.api.math.FloatMath;
 import com.jfixby.psd.unpacker.api.PSDLayer;
 import com.jfixby.psd.unpacker.api.PSDRaster;
 import com.jfixby.psd.unpacker.api.PSDRasterPosition;
-import com.jfixby.r3.api.shader.srlz.SHADER_PARAMETERS;
 import com.jfixby.r3.ext.api.scene2d.srlz.Action;
 import com.jfixby.r3.ext.api.scene2d.srlz.ActionsGroup;
 import com.jfixby.r3.ext.api.scene2d.srlz.Anchor;
@@ -25,11 +22,9 @@ import com.jfixby.r3.ext.api.scene2d.srlz.CameraSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.ChildSceneSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.InputSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.LayerElement;
+import com.jfixby.r3.ext.api.scene2d.srlz.RASTER_BLEND_MODE;
 import com.jfixby.r3.ext.api.scene2d.srlz.Scene2DPackage;
 import com.jfixby.r3.ext.api.scene2d.srlz.SceneStructure;
-import com.jfixby.r3.ext.api.scene2d.srlz.ShaderParameter;
-import com.jfixby.r3.ext.api.scene2d.srlz.ShaderParameterType;
-import com.jfixby.r3.ext.api.scene2d.srlz.ShaderSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.TextSettings;
 
 public class PSDtoScene2DConverter {
@@ -327,58 +322,64 @@ public class PSDtoScene2DConverter {
 			SceneStructurePackingResult result, double scale_factor) {
 
 		PSDLayer shader_node = input.findChildByNamePrefix(TAGS.R3_SHADER);
-		ShaderSettings shader_settings = null;
-		if (shader_node != null) {
-			shader_settings = new ShaderSettings();
-
-			shader_settings.is_hidden = !shader_node.isVisible();
-
-			{
-				PSDLayer id_layer = findChild(TAGS.ID, shader_node);
-				if (id_layer == null) {
-					throw new Error("Missing tag <@" + TAGS.ID + ">");
-				} else {
-					String id_string = readParameter(id_layer.getName(), TAGS.ID);
-					shader_settings.shader_name = id_string;
-
-					AssetID shader_id = naming.childShader(id_string);
-					shader_settings.shader_asset_id = shader_id.toString();
-					result.addRequiredAsset(shader_id, Collections.newList(shader_node));
-				}
-			}
-
-			{
-
-				PSDLayer origin = shader_node.findChildByNamePrefix(TAGS.ORIGIN);
-				if (origin != null) {
-					double shader_x = origin.getRaster().getPosition().getX() * scale_factor;
-					double shader_y = origin.getRaster().getPosition().getY() * scale_factor;
-					ShaderParameter canvas_x = new ShaderParameter(SHADER_PARAMETERS.POSITION_X, "" + shader_x,
-							ShaderParameterType.FLOAT);
-					ShaderParameter canvas_y = new ShaderParameter(SHADER_PARAMETERS.POSITION_Y, "" + shader_y,
-							ShaderParameterType.FLOAT);
-
-					shader_settings.params.addElement(canvas_x);
-					shader_settings.params.addElement(canvas_y);
-
-					PSDLayer radius = shader_node.findChildByNamePrefix(TAGS.RADIUS);
-					if (radius != null) {
-						double rx = radius.getRaster().getPosition().getX() * scale_factor;
-						double ry = radius.getRaster().getPosition().getY() * scale_factor;
-						double shader_radius = FloatMath.distance(shader_x, shader_y, rx, ry);
-
-						ShaderParameter radius_p = new ShaderParameter(SHADER_PARAMETERS.RADIUS, "" + shader_radius,
-								ShaderParameterType.FLOAT);
-
-						shader_settings.params.addElement(radius_p);
-
-					} else {
-						Err.reportError("Shader radius not found: " + shader_node);
-					}
-				}
-			}
-
-		}
+		// ShaderSettings shader_settings = null;
+		// if (shader_node != null) {
+		// shader_settings = new ShaderSettings();
+		//
+		// shader_settings.is_hidden = !shader_node.isVisible();
+		//
+		// {
+		// PSDLayer id_layer = findChild(TAGS.ID, shader_node);
+		// if (id_layer == null) {
+		// throw new Error("Missing tag <@" + TAGS.ID + ">");
+		// } else {
+		// String id_string = readParameter(id_layer.getName(), TAGS.ID);
+		// shader_settings.shader_name = id_string;
+		//
+		// AssetID shader_id = naming.childShader(id_string);
+		// shader_settings.shader_asset_id = shader_id.toString();
+		// result.addRequiredAsset(shader_id, Collections.newList(shader_node));
+		// }
+		// }
+		//
+		// {
+		//
+		// PSDLayer origin = shader_node.findChildByNamePrefix(TAGS.ORIGIN);
+		// if (origin != null) {
+		// double shader_x = origin.getRaster().getPosition().getX() *
+		// scale_factor;
+		// double shader_y = origin.getRaster().getPosition().getY() *
+		// scale_factor;
+		// ShaderParameter canvas_x = new
+		// ShaderParameter(SHADER_PARAMETERS.POSITION_X, "" + shader_x,
+		// ShaderParameterType.FLOAT);
+		// ShaderParameter canvas_y = new
+		// ShaderParameter(SHADER_PARAMETERS.POSITION_Y, "" + shader_y,
+		// ShaderParameterType.FLOAT);
+		//
+		// shader_settings.params.addElement(canvas_x);
+		// shader_settings.params.addElement(canvas_y);
+		//
+		// PSDLayer radius = shader_node.findChildByNamePrefix(TAGS.RADIUS);
+		// if (radius != null) {
+		// double rx = radius.getRaster().getPosition().getX() * scale_factor;
+		// double ry = radius.getRaster().getPosition().getY() * scale_factor;
+		// double shader_radius = FloatMath.distance(shader_x, shader_y, rx,
+		// ry);
+		//
+		// ShaderParameter radius_p = new
+		// ShaderParameter(SHADER_PARAMETERS.RADIUS, "" + shader_radius,
+		// ShaderParameterType.FLOAT);
+		//
+		// shader_settings.params.addElement(radius_p);
+		//
+		// } else {
+		// Err.reportError("Shader radius not found: " + shader_node);
+		// }
+		// }
+		// }
+		//
+		// }
 		{
 			LayerElement output = coutput;
 			// output.shader_settings = shader_settings;
@@ -775,6 +776,7 @@ public class PSDtoScene2DConverter {
 		// }
 
 		output.is_raster = true;
+		output.blend_mode = RASTER_BLEND_MODE.valueOf(input.getMode().toString());
 		output.position_x = position.getX() * scale_factor;
 		output.position_y = position.getY() * scale_factor;
 		output.width = position.getWidth() * scale_factor;
@@ -783,4 +785,5 @@ public class PSDtoScene2DConverter {
 		output.raster_id = raster_name;
 		result.addRequiredAsset(Names.newAssetID(output.raster_id), Collections.newList(input));
 	}
+
 }
