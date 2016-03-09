@@ -133,6 +133,7 @@ public class PSDRepacker {
 				producePackageDescriptor(container_file.parent().parent(), StandardPackageFormats.RedTriplane.TiledRaster, "1.0", packed_structures, requred_rasters, container_file.getName());
 
 			}
+			Sys.exit();
 			L.d("---[Packing Atlas]--------------------------------------------");
 			File atlas_folder = temp_folder.child("atlas");
 			atlas_folder.makeFolder();
