@@ -63,7 +63,7 @@ public class PSDRepacker {
 	// File tmp_mount = repacking_output.parent().child("temp");
 	File tmp_mount = repacking_output;
 	tmp_mount.makeFolder();
-	TempFolder temp_folder_handler = FileCache.createTempFolder(tmp_mount);
+	TempFolder temp_folder_handler = FileCache.createTempFolder();
 	File temp_folder = temp_folder_handler.getRoot();
 	related_folders.add(temp_folder);
 	// L.d("temp_folder", temp_folder);
