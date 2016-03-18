@@ -11,6 +11,7 @@ public class PSDRepackSettings {
     private int max_texture_size;
     private int margin;
     private boolean ignore_atlas;
+    private int altas_max_page_size = 1024;
 
     public void setPSDFile(File psd_file) {
 	this.psd_file = psd_file;
@@ -60,6 +61,12 @@ public class PSDRepackSettings {
 	return this.margin;
     }
 
- 
+    public void setAtlasMaxPageSize(int altas_max_page_size) {
+	this.altas_max_page_size = altas_max_page_size;
+    }
+
+    public int getAtlasMaxPageSize() {
+	return altas_max_page_size;
+    }
 
 }

@@ -53,6 +53,7 @@ public class PSDRepacker {
 	File repacking_output = settings.getOutputFolder();
 	int max_texture_size = settings.getMaxTextureSize();
 	int margin = settings.getMargin();
+	int max_page_size = settings.getAtlasMaxPageSize();
 	List<File> related_folders = Collections.newList();
 	handler.setRelatedFolders(related_folders);
 	boolean ignore_atlas = settings.getIgnoreAtlasFlag();
@@ -145,7 +146,7 @@ public class PSDRepacker {
 	    File atlas_folder = temp_folder.child("atlas");
 	    atlas_folder.makeFolder();
 	    AtlasPackingResult atlas_result = packAtlas(atlas_folder, tiling_folder,
-		    package_name.child("psd").child("raster").toString());
+		    package_name.child("psd").child("raster").toString(), max_page_size);
 
 	    atlas_result.print();
 
@@ -273,8 +274,8 @@ public class PSDRepacker {
 
     }
 
-    static private AtlasPackingResult packAtlas(File atlas_folder, File sprites, String atlas_file_name)
-	    throws IOException {
+    static private AtlasPackingResult packAtlas(File atlas_folder, File sprites, String atlas_file_name,
+	    int max_page_size) throws IOException {
 
 	TexturePackingSpecs specs = TexturePacker.newPackingSpecs();
 
@@ -282,6 +283,7 @@ public class PSDRepacker {
 	specs.setOutputAtlasFolder(atlas_folder);
 	specs.setInputRasterFolder(sprites);
 	specs.setDebugMode(!true);
+	specs.setMaxPageSize(max_page_size);
 
 	Packer packer = TexturePacker.newPacker(specs);
 
