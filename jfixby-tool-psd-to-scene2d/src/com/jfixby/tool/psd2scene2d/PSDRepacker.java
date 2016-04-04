@@ -17,11 +17,11 @@ import com.jfixby.cmns.api.file.File;
 import com.jfixby.cmns.api.file.FileSystem;
 import com.jfixby.cmns.api.file.cache.FileCache;
 import com.jfixby.cmns.api.file.cache.TempFolder;
-import com.jfixby.cmns.api.json.Json;
+import com.jfixby.cmns.api.io.IO;
+import com.jfixby.cmns.api.java.ByteArray;
 import com.jfixby.cmns.api.log.L;
 import com.jfixby.cmns.api.math.FloatMath;
 import com.jfixby.cmns.api.math.IntegerMath;
-import com.jfixby.cmns.api.sys.Sys;
 import com.jfixby.psd.unpacker.api.PSDFileContent;
 import com.jfixby.psd.unpacker.api.PSDLayer;
 import com.jfixby.psd.unpacker.api.PSDRaster;
@@ -33,6 +33,7 @@ import com.jfixby.psd.unpacker.api.PSDUnpackingParameters;
 import com.jfixby.r3.api.resources.StandardPackageFormats;
 import com.jfixby.r3.ext.api.scene2d.srlz.Scene2DPackage;
 import com.jfixby.rana.api.pkg.fs.PackageDescriptor;
+import com.jfixby.red.engine.core.resources.PackageUtils;
 import com.jfixby.texture.slicer.api.SlicesCompositionInfo;
 import com.jfixby.texture.slicer.api.SlicesCompositionsContainer;
 import com.jfixby.texture.slicer.api.TextureSlicer;
@@ -130,13 +131,13 @@ public class PSDRepacker {
 
 		container_file = container_file.child(sctruct_package_name.toString());
 
-		String data = Json.serializeToString(container);
-		container_file.writeString(data);
+		ByteArray data = IO.serialize(container);
+		container_file.writeBytes(data);
 
 		// used_raster.print("used_raster");
 		// packed_structures.print("packed_structures");
 		// Sys.exit();
-		producePackageDescriptor(container_file.parent().parent(),
+		PackageUtils.producePackageDescriptor(container_file.parent().parent(),
 			StandardPackageFormats.RedTriplane.TiledRaster, "1.0", packed_structures, requred_rasters,
 			container_file.getName());
 
@@ -168,7 +169,7 @@ public class PSDRepacker {
 	    packed_rasters.addAll(atlas_result.listPackedAssets());
 
 	    File atlasPackageFolder = atlas_output.parent();
-	    producePackageDescriptor(atlasPackageFolder, StandardPackageFormats.libGDX.Atlas_GWT, "1.0", packed_rasters,
+	    PackageUtils. producePackageDescriptor(atlasPackageFolder, StandardPackageFormats.libGDX.Atlas_GWT, "1.0", packed_rasters,
 		    Collections.newList(), atlas_name);
 
 	    // requred_rasters.print("requred_rasters");
@@ -215,29 +216,7 @@ public class PSDRepacker {
 	return result;
     }
 
-    static private void producePackageDescriptor(File output_folder, String format, String version,
-	    Collection<AssetID> provisions, Collection<AssetID> dependencies, String root_file_name)
-	    throws IOException {
-
-	PackageDescriptor descriptor = new PackageDescriptor();
-	descriptor.format = format;
-	descriptor.timestamp = "" + Sys.SystemTime().currentTimeMillis();
-	descriptor.version = version;
-	for (AssetID d : provisions) {
-	    descriptor.packed_assets.addElement(d.toString());
-	}
-	for (AssetID d : dependencies) {
-	    descriptor.package_dependencies.addElement(d.toString());
-	}
-
-	descriptor.root_file_name = root_file_name;
-	File output_file = output_folder.child(PackageDescriptor.PACKAGE_DESCRIPTOR_FILE_NAME);
-	String data = Json.serializeToString(descriptor);
-	output_file.writeString(data);
-
-	L.d("packing", data);
-
-    }
+   
 
     static private ConversionResult packLayers(PSDFileContent layers_structure, AssetID package_name, File final_output,
 	    Map<PSDLayer, AssetID> raster_names) throws IOException {
@@ -253,9 +232,9 @@ public class PSDRepacker {
 	// SceneStructure structure = container.structures.get(0);
 	// structure.structure_name = package_prefix;
 	String root_file_name = package_prefix.child(Scene2DPackage.SCENE2D_PACKAGE_FILE_EXTENSION).toString();
-	String data = Json.serializeToString(container);
+	ByteArray data = IO.serialize(container);
 	File file = final_output.child(root_file_name);
-	file.writeString(data);
+	file.writeBytes(data);
 
 	File descriptor = file.parent().parent();
 
@@ -267,7 +246,7 @@ public class PSDRepacker {
 	}
 
 	Collection<AssetID> requred_assets = result.listAllRequredAssets();
-	producePackageDescriptor(descriptor, Scene2DPackage.SCENE2D_PACKAGE_FORMAT, "1.0", provisions, requred_assets,
+	PackageUtils.producePackageDescriptor(descriptor, Scene2DPackage.SCENE2D_PACKAGE_FORMAT, "1.0", provisions, requred_assets,
 		root_file_name);
 
 	return result;

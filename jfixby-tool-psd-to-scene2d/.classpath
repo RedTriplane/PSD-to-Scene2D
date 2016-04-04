@@ -12,5 +12,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/rana-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/red-triplane-shader-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-cmns-api-desktop"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/rana-asset-red"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
