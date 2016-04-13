@@ -18,6 +18,8 @@ import com.jfixby.cmns.api.file.FileSystem;
 import com.jfixby.cmns.api.file.LocalFileSystem;
 import com.jfixby.cmns.api.file.cache.FileCache;
 import com.jfixby.cmns.api.file.cache.TempFolder;
+import com.jfixby.cmns.api.image.ColorMap;
+import com.jfixby.cmns.api.image.ImageProcessing;
 import com.jfixby.cmns.api.io.IO;
 import com.jfixby.cmns.api.java.ByteArray;
 import com.jfixby.cmns.api.log.L;
@@ -58,7 +60,7 @@ public class PSDRepacker {
 		final File repacking_output = settings.getOutputFolder();
 		final int max_texture_size = settings.getMaxTextureSize();
 		final int margin = settings.getMargin();
-		final float imageQuality = settings.getImageQuality();
+		final float imageQuality = FloatMath.limit(0, settings.getImageQuality(), 1);
 // int padding = margin;
 		final int max_page_size = settings.getAtlasMaxPageSize();
 		final List<File> related_folders = Collections.newList();
@@ -318,9 +320,14 @@ public class PSDRepacker {
 		if (imageQuality == 1) {
 			tiling_folder.getFileSystem().copyFileToFolder(file_to_copy, tiling_folder);
 		} else {
-			final BufferedImage image = ImageAWT.readFromFile(file_to_copy);
-			final File restoredFile = tiling_folder.child(file_to_copy.getName());
-			ImageAWT.writeToFile(ImageAWT.toBufferedImage(ImageAWT.awtScale(image, imageQuality)), restoredFile, "PNG");
+			ColorMap image = ImageAWT.readAWTColorMap(file_to_copy);
+			image = ImageProcessing.scale(image, imageQuality);
+			final File outputFile = tiling_folder.child(file_to_copy.getName());
+			ImageAWT.writeToFile(image, outputFile, "PNG");
+
+// final BufferedImage image = ImageAWT.readFromFile(file_to_copy);
+// final File restoredFile = tiling_folder.child(file_to_copy.getName());
+// ImageAWT.writeToFile(ImageAWT.toBufferedImage(ImageAWT.awtScale(image, imageQuality)), restoredFile, "PNG");
 		}
 	}
 
