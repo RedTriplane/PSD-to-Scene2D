@@ -1,7 +1,6 @@
 
 package com.jfixby.tool.psd2scene2d;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -19,9 +18,6 @@ import com.jfixby.cmns.api.file.FileSystem;
 import com.jfixby.cmns.api.file.LocalFileSystem;
 import com.jfixby.cmns.api.file.cache.FileCache;
 import com.jfixby.cmns.api.file.cache.TempFolder;
-import com.jfixby.cmns.api.image.ArrayColorMap;
-import com.jfixby.cmns.api.image.ColorMap;
-import com.jfixby.cmns.api.image.ImageProcessing;
 import com.jfixby.cmns.api.io.IO;
 import com.jfixby.cmns.api.java.ByteArray;
 import com.jfixby.cmns.api.log.L;
@@ -322,13 +318,9 @@ public class PSDRepacker {
 		if (imageQuality == 1) {
 			tiling_folder.getFileSystem().copyFileToFolder(file_to_copy, tiling_folder);
 		} else {
-
-			final ArrayColorMap image = ImageAWT.readAWTColorMap(file_to_copy);
-			final int width = (int)FloatMath.floorUp(image.getWidth() * imageQuality);
-			final int height = (int)FloatMath.floorUp(image.getHeight() * imageQuality);
-			final ColorMap output = ImageProcessing.scaleTo(image, width, height);
+			final BufferedImage image = ImageAWT.readFromFile(file_to_copy);
 			final File restoredFile = tiling_folder.child(file_to_copy.getName());
-			ImageAWT.writeToFile(output, restoredFile, "PNG");
+			ImageAWT.writeToFile(ImageAWT.toBufferedImage(ImageAWT.awtScale(image, imageQuality)), restoredFile, "PNG");
 		}
 	}
 
@@ -395,14 +387,14 @@ public class PSDRepacker {
 
 		final SceneStructurePackingResult result = pack_result.getStrucutreResultByLayer(layer);
 
-		final double scale_factor = result.getScaleFactor();
+		final float scale_factor = result.getScaleFactor();
 
 		BufferedImage out;
 		if (scale_factor != 1) {
-			final Image tmp = java_image.getScaledInstance((int)(java_image.getWidth() * scale_factor),
-				(int)(java_image.getHeight() * scale_factor), BufferedImage.SCALE_SMOOTH);
-
-			out = ImageAWT.toBufferedImage(tmp);
+// final Image tmp = java_image.getScaledInstance((int)(java_image.getWidth() * scale_factor),
+// (int)(java_image.getHeight() * scale_factor), BufferedImage.SCALE_SMOOTH);
+// final Image tmp = ;
+			out = ImageAWT.toBufferedImage(ImageAWT.awtScale(java_image, scale_factor));
 		} else {
 			out = java_image;
 		}
