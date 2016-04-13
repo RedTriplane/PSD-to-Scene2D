@@ -15,28 +15,29 @@ public class PSDRepackSettings {
 	private int altas_max_page_size = 1024;
 	private int gemserkPadding = -1;
 	private int texturePadding;
+	private boolean forceRasterDecomposition;
 
-	public void setPSDFile (File psd_file) {
+	public void setPSDFile (final File psd_file) {
 		this.psd_file = psd_file;
 	}
 
-	public void setPackageName (AssetID package_name) {
+	public void setPackageName (final AssetID package_name) {
 		this.package_name = package_name;
 	}
 
-	public void setOutputFolder (File output_folder) {
+	public void setOutputFolder (final File output_folder) {
 		this.output_folder = output_folder;
 	}
 
-	public void setMaxTextureSize (int max_texture_size) {
+	public void setMaxTextureSize (final int max_texture_size) {
 		this.max_texture_size = max_texture_size;
 	}
 
-	public void setMargin (int margin) {
+	public void setMargin (final int margin) {
 		this.margin = margin;
 	}
 
-	public void setIgonreAtlasFlag (boolean ignore_atlas) {
+	public void setIgonreAtlasFlag (final boolean ignore_atlas) {
 		this.ignore_atlas = ignore_atlas;
 	}
 
@@ -64,28 +65,36 @@ public class PSDRepackSettings {
 		return this.margin;
 	}
 
-	public void setAtlasMaxPageSize (int altas_max_page_size) {
+	public void setAtlasMaxPageSize (final int altas_max_page_size) {
 		this.altas_max_page_size = altas_max_page_size;
 	}
 
 	public int getAtlasMaxPageSize () {
-		return altas_max_page_size;
+		return this.altas_max_page_size;
 	}
 
 	public int getGemserkPadding () {
-		return gemserkPadding;
+		return this.gemserkPadding;
 	}
 
-	public void setGemserkPadding (int gemserkPadding) {
+	public void setGemserkPadding (final int gemserkPadding) {
 		this.gemserkPadding = gemserkPadding;
 	}
 
-	public void setPadding (int texturePadding) {
+	public void setPadding (final int texturePadding) {
 		this.texturePadding = texturePadding;
 	}
 
 	public int getPadding () {
-		return texturePadding;
+		return this.texturePadding;
+	}
+
+	public void setForceRasterDecomposition (final boolean forceRasterDecomposition) {
+		this.forceRasterDecomposition = forceRasterDecomposition;
+	}
+
+	public boolean forceRasterDecomposition () {
+		return this.forceRasterDecomposition;
 	}
 
 }

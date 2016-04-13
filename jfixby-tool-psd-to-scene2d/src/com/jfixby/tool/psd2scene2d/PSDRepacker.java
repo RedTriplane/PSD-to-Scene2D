@@ -16,6 +16,7 @@ import com.jfixby.cmns.api.debug.Debug;
 import com.jfixby.cmns.api.desktop.ImageAWT;
 import com.jfixby.cmns.api.file.File;
 import com.jfixby.cmns.api.file.FileSystem;
+import com.jfixby.cmns.api.file.LocalFileSystem;
 import com.jfixby.cmns.api.file.cache.FileCache;
 import com.jfixby.cmns.api.file.cache.TempFolder;
 import com.jfixby.cmns.api.io.IO;
@@ -65,14 +66,16 @@ public class PSDRepacker {
 		final boolean ignore_atlas = settings.getIgnoreAtlasFlag();
 		final int gemserk = settings.getGemserkPadding();
 		final int padding = settings.getPadding();
+		final boolean forceRasterDecomposition = settings.forceRasterDecomposition();
 
 		final FileSystem FS = psd_file.getFileSystem();
 
 		// File tmp_mount = repacking_output.parent().child("temp");
-		final File tmp_mount = repacking_output;
-		tmp_mount.makeFolder();
-		final TempFolder temp_folder_handler = FileCache.createTempFolder();
+// final File tmp_mount = repacking_output;
+// tmp_mount.makeFolder();
+		final TempFolder temp_folder_handler = FileCache.createTempFolder(LocalFileSystem.ApplicationHome().child("tmp"));
 		final File temp_folder = temp_folder_handler.getRoot();
+		temp_folder.makeFolder();
 		related_folders.add(temp_folder);
 		// L.d("temp_folder", temp_folder);
 
@@ -111,7 +114,7 @@ public class PSDRepacker {
 			final File tiling_folder = temp_folder.child("tiling");
 			tiling_folder.makeFolder();
 			final Collection<TextureSlicingResult> structures = decomposeRaster(layer_to_file_mapping, tiling_folder,
-				max_texture_size, margin);
+				max_texture_size, margin, forceRasterDecomposition);
 			raster_folder.delete();
 
 			final SlicesCompositionsContainer container = new SlicesCompositionsContainer();
@@ -287,7 +290,8 @@ public class PSDRepacker {
 	}
 
 	static private List<TextureSlicingResult> decomposeRaster (final Map<PSDLayer, File> layer_to_file_mapping,
-		final File tiling_folder, final int max_texture_size, final int margin) throws IOException {
+		final File tiling_folder, final int max_texture_size, final int margin, final boolean forceRasterDecomposition)
+		throws IOException {
 		final List<TextureSlicingResult> results = Collections.newList();
 		for (int i = 0; i < layer_to_file_mapping.size(); i++) {
 			final PSDLayer layer_info = layer_to_file_mapping.getKeyAt(i);
@@ -297,7 +301,7 @@ public class PSDRepacker {
 			final double height = dim.getHeight();
 			final double diag = FloatMath.max(width, height);
 			final File png_file = layer_to_file_mapping.get(layer_info);
-			if (diag > max_texture_size) {
+			if (forceRasterDecomposition || diag > max_texture_size) {
 				// decompose
 				final TextureSlicingResult result = decomposeSprite(png_file, tiling_folder, margin, max_texture_size);
 				results.add(result);
