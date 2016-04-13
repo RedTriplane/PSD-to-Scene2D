@@ -283,7 +283,7 @@ public class PSDtoScene2DConverter {
 			} else {
 				final String child_id = readParameter(id, TAGS.ID);
 
-				final AssetID child_scene_asset_id = naming.childScene(child_id);
+				final AssetID child_scene_asset_id = Names.newAssetID(child_id);
 
 				output.child_scene_settings.child_scene_id = child_scene_asset_id.toString();
 
