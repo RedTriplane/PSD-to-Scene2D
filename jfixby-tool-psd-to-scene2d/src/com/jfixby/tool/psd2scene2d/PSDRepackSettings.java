@@ -16,6 +16,7 @@ public class PSDRepackSettings {
 	private int gemserkPadding = -1;
 	private int texturePadding;
 	private boolean forceRasterDecomposition;
+	private float imageQuality = 1;
 
 	public void setPSDFile (final File psd_file) {
 		this.psd_file = psd_file;
@@ -95,6 +96,14 @@ public class PSDRepackSettings {
 
 	public boolean forceRasterDecomposition () {
 		return this.forceRasterDecomposition;
+	}
+
+	public float getImageQuality () {
+		return this.imageQuality;
+	}
+
+	public void setImageQuality (final float imageQuality) {
+		this.imageQuality = imageQuality;
 	}
 
 }
