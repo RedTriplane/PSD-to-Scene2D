@@ -41,6 +41,7 @@ public class PSDtoScene2DConverter {
 		final ConversionResult results = new ConversionResult();
 		// naming.print("naming");
 
+		final LayersStack stack = new LayersStack();
 		for (int i = 0; i < root.numberOfChildren(); i++) {
 			final PSDLayer candidate = root.getChild(i);
 			final String candidate_name = candidate.getName();
@@ -51,7 +52,7 @@ public class PSDtoScene2DConverter {
 				}
 				final PSDLayer name_layer = candidate.findChildByNamePrefix(TAGS.STRUCTURE_NAME);
 				if (name_layer == null) {
-					L.d("missing NAME tag");
+					Err.reportError("missing NAME tag");
 					continue;
 				}
 
@@ -79,7 +80,7 @@ public class PSDtoScene2DConverter {
 				final PsdRepackerNameResolver naming = new PsdRepackerNameResolver(Names.newAssetID(structure.structure_name),
 					raster_names);
 
-				convert(content_layer, element, naming, result_i, scale_factor);
+				convert(stack, content_layer, element, naming, result_i, scale_factor);
 
 				element.name = structure.structure_name;
 
@@ -120,10 +121,11 @@ public class PSDtoScene2DConverter {
 
 	}
 
-	private static void convert (final PSDLayer input, final LayerElement output, final ChildAssetsNameResolver naming,
-		final SceneStructurePackingResult result, final double scale_factor) {
+	private static void convert (final LayersStack stack, final PSDLayer input, final LayerElement output,
+		final ChildAssetsNameResolver naming, final SceneStructurePackingResult result, final double scale_factor) {
 
 		if (input.isFolder()) {
+			stack.push(input);
 			final PSDLayer animation_node = input.findChildByNamePrefix(TAGS.ANIMATION);
 			final PSDLayer childscene_node = input.findChildByNamePrefix(TAGS.CHILD_SCENE);
 			final PSDLayer text_node = input.findChildByNamePrefix(TAGS.R3_TEXT);
@@ -134,7 +136,7 @@ public class PSDtoScene2DConverter {
 				if (input.numberOfChildren() != 1) {
 					throw new Error("Annotation problem (only one child allowed). This is not an animation node: " + input);
 				}
-				convertAnimation(input, output, naming, result, scale_factor);
+				convertAnimation(stack, input, output, naming, result, scale_factor);
 			} else if (childscene_node != null) {
 				if (input.numberOfChildren() != 1) {
 					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
@@ -149,12 +151,12 @@ public class PSDtoScene2DConverter {
 				if (input.numberOfChildren() != 1) {
 					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
-				convertText(input, output, naming, result, scale_factor);
+				convertText(stack, input, output, naming, result, scale_factor);
 			} else if (user_input != null) {
 				if (input.numberOfChildren() != 1) {
 					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
-				convertInput(input, output, naming, result, scale_factor);
+				convertInput(stack, input, output, naming, result, scale_factor);
 			} else if (false) {
 				if (input.numberOfChildren() != 1) {
 					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
@@ -162,9 +164,9 @@ public class PSDtoScene2DConverter {
 				// convertEventsSequence(input, output, naming, result,
 				// scale_factor);
 			} else {
-				convertFolder(input, output, naming, result, scale_factor);
+				convertFolder(stack, input, output, naming, result, scale_factor);
 			}
-
+			stack.pop(input);
 		} else if (input.isRaster()) {
 			convertRaster(input, output, naming, result, scale_factor);
 		}
@@ -294,8 +296,8 @@ public class PSDtoScene2DConverter {
 
 	}
 
-	private static void convertText (final PSDLayer input_parent, final LayerElement output, final ChildAssetsNameResolver naming,
-		final SceneStructurePackingResult result, final double scale_factor) {
+	private static void convertText (final LayersStack stack, final PSDLayer input_parent, final LayerElement output,
+		final ChildAssetsNameResolver naming, final SceneStructurePackingResult result, final double scale_factor) {
 
 		final String name = input_parent.getName();
 		output.is_hidden = !input_parent.isVisible();
@@ -395,8 +397,8 @@ public class PSDtoScene2DConverter {
 		}
 	}
 
-	private static void convertFolder (final PSDLayer input, final LayerElement coutput, final ChildAssetsNameResolver naming,
-		final SceneStructurePackingResult result, final double scale_factor) {
+	private static void convertFolder (final LayersStack stack, final PSDLayer input, final LayerElement coutput,
+		final ChildAssetsNameResolver naming, final SceneStructurePackingResult result, final double scale_factor) {
 
 		{
 			final LayerElement output = coutput;
@@ -413,17 +415,18 @@ public class PSDtoScene2DConverter {
 				// }
 				final LayerElement element = new LayerElement();
 				output.children.addElement(element);
-				convert(child, element, naming, result, scale_factor);
+				convert(stack, child, element, naming, result, scale_factor);
 
 				if (element.name.startsWith("@")) {
+					stack.print();
 					throw new Error("Bad layer name: " + element.name);
 				}
 			}
 		}
 	}
 
-	private static void convertInput (final PSDLayer input_parent, final LayerElement output, final ChildAssetsNameResolver naming,
-		final SceneStructurePackingResult result, final double scale_factor) {
+	private static void convertInput (final LayersStack stack, final PSDLayer input_parent, final LayerElement output,
+		final ChildAssetsNameResolver naming, final SceneStructurePackingResult result, final double scale_factor) {
 
 		final String name = input_parent.getName();
 		output.is_hidden = !input_parent.isVisible();
@@ -452,7 +455,7 @@ public class PSDtoScene2DConverter {
 			if (raster == null) {
 				throw new Error("Missing button raster: " + input);
 			} else {
-				extractButtonRaster(raster, output, naming, result, scale_factor);
+				extractButtonRaster(stack, raster, output, naming, result, scale_factor);
 			}
 		}
 
@@ -523,14 +526,14 @@ public class PSDtoScene2DConverter {
 
 	}
 
-	private static void extractButtonRaster (final PSDLayer raster, final LayerElement output,
+	private static void extractButtonRaster (final LayersStack stack, final PSDLayer raster, final LayerElement output,
 		final ChildAssetsNameResolver naming, final SceneStructurePackingResult result, final double scale_factor) {
 
 		{
 			final PSDLayer on_released = raster.findChildByName(TAGS.BUTTON_ON_RELEASED);
 			if (on_released != null) {
 				final LayerElement converted = new LayerElement();
-				convert(on_released, converted, naming, result, scale_factor);
+				convert(stack, on_released, converted, naming, result, scale_factor);
 				output.input_settings.on_released = converted;
 			}
 		}
@@ -539,7 +542,7 @@ public class PSDtoScene2DConverter {
 			final PSDLayer on_hover = raster.findChildByName(TAGS.BUTTON_ON_HOVER);
 			if (on_hover != null) {
 				final LayerElement converted = new LayerElement();
-				convert(on_hover, converted, naming, result, scale_factor);
+				convert(stack, on_hover, converted, naming, result, scale_factor);
 				output.input_settings.on_hover = converted;
 			}
 		}
@@ -548,7 +551,7 @@ public class PSDtoScene2DConverter {
 			final PSDLayer on_press = raster.findChildByName(TAGS.BUTTON_ON_PRESS);
 			if (on_press != null) {
 				final LayerElement converted = new LayerElement();
-				convert(on_press, converted, naming, result, scale_factor);
+				convert(stack, on_press, converted, naming, result, scale_factor);
 				output.input_settings.on_press = converted;
 			}
 		}
@@ -557,7 +560,7 @@ public class PSDtoScene2DConverter {
 			final PSDLayer on_pressed = raster.findChildByName(TAGS.BUTTON_ON_PRESSED);
 			if (on_pressed != null) {
 				final LayerElement converted = new LayerElement();
-				convert(on_pressed, converted, naming, result, scale_factor);
+				convert(stack, on_pressed, converted, naming, result, scale_factor);
 				output.input_settings.on_pressed = converted;
 			}
 		}
@@ -566,14 +569,14 @@ public class PSDtoScene2DConverter {
 			final PSDLayer on_release = raster.findChildByName(TAGS.BUTTON_ON_RELEASE);
 			if (on_release != null) {
 				final LayerElement converted = new LayerElement();
-				convert(on_release, converted, naming, result, scale_factor);
+				convert(stack, on_release, converted, naming, result, scale_factor);
 				output.input_settings.on_release = converted;
 			}
 		}
 
 	}
 
-	private static void convertAnimation (final PSDLayer input_parent, final LayerElement output,
+	private static void convertAnimation (final LayersStack stack, final PSDLayer input_parent, final LayerElement output,
 		final ChildAssetsNameResolver naming, final SceneStructurePackingResult result, final double scale_factor) {
 
 		final String name = input_parent.getName();
@@ -658,7 +661,7 @@ public class PSDtoScene2DConverter {
 					final PSDLayer child = frames.getChild(i);
 					final LayerElement element = new LayerElement();
 					output.children.addElement(element);
-					convert(child, element, naming, result, scale_factor);
+					convert(stack, child, element, naming, result, scale_factor);
 				}
 				if (frames.numberOfChildren() == 0) {
 					throw new Error("No frames found for " + output.animation_id);
@@ -715,7 +718,7 @@ public class PSDtoScene2DConverter {
 					}
 					final LayerElement element = new LayerElement();
 					output.children.addElement(element);
-					convert(child, element, naming, result, scale_factor);
+					convert(stack, child, element, naming, result, scale_factor);
 					element.position_x = element.position_x - origin.getX();
 					element.position_y = element.position_y - origin.getY();
 

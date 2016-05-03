@@ -75,7 +75,9 @@ public class PSDRepacker {
 		// File tmp_mount = repacking_output.parent().child("temp");
 // final File tmp_mount = repacking_output;
 // tmp_mount.makeFolder();
-		final TempFolder temp_folder_handler = FileCache.createTempFolder(LocalFileSystem.ApplicationHome().child("tmp"));
+		final File tmp = LocalFileSystem.ApplicationHome().child("tmp");
+		tmp.makeFolder();
+		final TempFolder temp_folder_handler = FileCache.createTempFolder(tmp);
 		final File temp_folder = temp_folder_handler.getRoot();
 		temp_folder.makeFolder();
 		related_folders.add(temp_folder);
