@@ -358,7 +358,7 @@ public class PSDtoScene2DConverter {
 		{
 			final PSDLayer id = findChild(TAGS.ID, input);
 			if (id == null) {
-				throw new Error("Missing tag <@" + TAGS.ID + ">");
+				throw new Error("Missing tag <" + TAGS.ID + ">");
 			} else {
 				final String bar_id_string = readParameter(id, TAGS.ID);
 				final AssetID bar_id = naming.childText(bar_id_string);
@@ -368,18 +368,20 @@ public class PSDtoScene2DConverter {
 		{
 			final PSDLayer text_node = input.findChildByNamePrefix(TAGS.TEXT);
 			if (text_node != null) {
-				final PSDLayer id = findChild(TAGS.ID, text_node);
-				if (id == null) {
-					throw new Error("Missing tag <@" + TAGS.ID + ">");
-				} else {
-					final String text_value_asset_id_string = readParameter(id.getName(), TAGS.ID);
-					final AssetID text_value_asset_id = naming.childText(text_value_asset_id_string);
-					output.text_settings.text_value_asset_id = text_value_asset_id.toString();
-					result.addRequiredAsset(text_value_asset_id, Collections.newList(input));
-				}
-				// AssetID child_scene_asset_id = null;
-				// result.addRequiredRaster(child_scene_asset_id,
-				// JUtils.newList(input_parent, input, background));
+// final PSDLayer id = findChild(TAGS.ID, text_node);
+// if (id == null) {
+// throw new Error("Missing tag <@" + TAGS.ID + ">");
+// } else {
+// stack.print();
+// throw new Error("Missing tag <@" + TAGS.ID + ">");
+// final String text_value_asset_id_string = readParameter(id.getName(), TAGS.ID);
+// final AssetID text_value_asset_id = naming.childText(text_value_asset_id_string);
+// output.text_settings.text_value_asset_id = text_value_asset_id.toString();
+// result.addRequiredAsset(text_value_asset_id, Collections.newList(input));
+// }
+// AssetID child_scene_asset_id = null;
+// result.addRequiredRaster(child_scene_asset_id,
+// JUtils.newList(input_parent, input, background));
 			}
 		}
 		{
@@ -418,9 +420,8 @@ public class PSDtoScene2DConverter {
 
 		final String name = input_parent.getName();
 		output.is_hidden = !input_parent.isVisible();
-		output.is_text = true;
-		output.name = name;
 		output.is_progress = true;
+		output.name = name;
 
 		final PSDLayer progress = input_parent.findChildByNamePrefix(TAGS.PROGRESS);
 
@@ -445,7 +446,7 @@ public class PSDtoScene2DConverter {
 				throw new Error("Missing tag <@" + TAGS.RASTER + ">");
 			} else {
 				final LayerElement rasterNode = new LayerElement();
-				convert(stack, raster, rasterNode, naming, result, scale_factor);
+				convert(stack, raster.getChild(0), rasterNode, naming, result, scale_factor);
 				output.children.add(rasterNode);
 			}
 		}
@@ -505,16 +506,6 @@ public class PSDtoScene2DConverter {
 		}
 
 		{
-			final PSDLayer raster = findChild(TAGS.RASTER, input);
-
-			if (raster == null) {
-
-			} else {
-				extractButtonRaster(stack, raster, output, naming, result, scale_factor);
-			}
-		}
-
-		{
 			final PSDLayer id = findChild(TAGS.ID, input);
 
 			if (id == null) {
@@ -534,6 +525,7 @@ public class PSDtoScene2DConverter {
 
 				output.input_settings.is_button = TAGS.VALUE_BUTTON.equalsIgnoreCase(type_value);
 				output.input_settings.is_switch = TAGS.VALUE_SWITCH.equalsIgnoreCase(type_value);
+				output.input_settings.is_custom = TAGS.VALUE_CUSTOM.equalsIgnoreCase(type_value);
 
 				// animation_settings.is_positions_modifyer_animation =
 				// ANIMATION_TYPE_POSITION_MODIFIER
@@ -541,16 +533,13 @@ public class PSDtoScene2DConverter {
 
 			}
 
-			if (output.input_settings.is_switch) {
-				{
-					final PSDLayer options = findChild(TAGS.OPTIONS, input);
-
-					if (options == null) {
-
-					} else {
-						extractButtonOptions(stack, options, output, naming, result, scale_factor);
-					}
-				}
+			final PSDLayer raster = findChild(TAGS.RASTER, input);
+			if (output.input_settings.is_button) {
+				extractButtonRaster(stack, raster, output, naming, result, scale_factor);
+			} else if (output.input_settings.is_switch) {
+				extractButtonOptions(stack, raster, output, naming, result, scale_factor);
+			} else if (output.input_settings.is_custom) {
+				extractButtonOptions(stack, raster, output, naming, result, scale_factor);
 			}
 
 		}
@@ -596,6 +585,10 @@ public class PSDtoScene2DConverter {
 
 	private static void extractButtonOptions (final LayersStack stack, final PSDLayer options, final LayerElement output,
 		final ChildAssetsNameResolver naming, final SceneStructurePackingResult result, final double scale_factor) {
+		if (options == null) {
+			stack.print();
+			Debug.checkNull(options);
+		}
 		for (int i = 0; i < options.numberOfChildren(); i++) {
 			final PSDLayer child = options.getChild(i);
 			final LayerElement converted = new LayerElement();
