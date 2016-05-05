@@ -88,6 +88,9 @@ public class PSDtoScene2DConverter {
 
 				setupCamera(stack, camera_layer, element, scale_factor);
 
+				structure.original_width = element.camera_settings.width;
+				structure.original_height = element.camera_settings.height;
+
 				L.d("structure found", structure.structure_name);
 
 				results.putResult(structure, result_i);
@@ -106,7 +109,7 @@ public class PSDtoScene2DConverter {
 
 		final PSDLayer area = camera_layer.findChildByNamePrefix(TAGS.AREA);
 		final PSDLayer mode = camera_layer.findChildByNamePrefix(TAGS.MODE);
-		if (area == null && mode == null) {
+		if (area == null) {
 			stack.print();
 			throw new Error("Tag <" + TAGS.AREA + "> not found.");
 		}
@@ -515,7 +518,17 @@ public class PSDtoScene2DConverter {
 				output.input_id = naming.childInput(output.input_id).toString();
 			}
 		}
-		// PSDLayer type = findChild(ANIMATION_TYPE, input);
+
+		final PSDLayer origin_layer = findChild(TAGS.ORIGIN, input);
+		final Float2 origin = Geometry.newFloat2();
+		if (origin_layer != null) {
+			final PSDRaster raster = origin_layer.getChild(0).getRaster();
+			origin.setXY(raster.getPosition().getX() * scale_factor, raster.getPosition().getY() * scale_factor);
+		}
+
+		output.position_x = origin.getX();
+		output.position_y = origin.getY();
+// PSDLayer type = findChild(ANIMATION_TYPE, input);
 		{
 			final PSDLayer type = findChild(TAGS.TYPE, input);
 			if (type == null) {
@@ -535,11 +548,11 @@ public class PSDtoScene2DConverter {
 
 			final PSDLayer raster = findChild(TAGS.RASTER, input);
 			if (output.input_settings.is_button) {
-				extractButtonRaster(stack, raster, output, naming, result, scale_factor);
+				extractButtonRaster(stack, raster, output, naming, result, scale_factor, origin);
 			} else if (output.input_settings.is_switch) {
-				extractButtonOptions(stack, raster, output, naming, result, scale_factor);
+				extractButtonOptions(stack, raster, output, naming, result, scale_factor, origin);
 			} else if (output.input_settings.is_custom) {
-				extractButtonOptions(stack, raster, output, naming, result, scale_factor);
+				extractButtonOptions(stack, raster, output, naming, result, scale_factor, origin);
 			}
 
 		}
@@ -561,8 +574,8 @@ public class PSDtoScene2DConverter {
 
 						final LayerElement area = new LayerElement();
 						touch_areas.children.addElement(area);
-						area.position_x = raster.getPosition().getX() * scale_factor;
-						area.position_y = raster.getPosition().getY() * scale_factor;
+						area.position_x = raster.getPosition().getX() * scale_factor - origin.getX();
+						area.position_y = raster.getPosition().getY() * scale_factor - origin.getY();
 						area.width = raster.getDimentions().getWidth() * scale_factor;
 						area.height = raster.getDimentions().getHeight() * scale_factor;
 						area.name = child.getName();
@@ -584,7 +597,8 @@ public class PSDtoScene2DConverter {
 	}
 
 	private static void extractButtonOptions (final LayersStack stack, final PSDLayer options, final LayerElement output,
-		final ChildAssetsNameResolver naming, final SceneStructurePackingResult result, final double scale_factor) {
+		final ChildAssetsNameResolver naming, final SceneStructurePackingResult result, final double scale_factor,
+		final Float2 origin) {
 		if (options == null) {
 			stack.print();
 			Debug.checkNull(options);
@@ -592,14 +606,22 @@ public class PSDtoScene2DConverter {
 		for (int i = 0; i < options.numberOfChildren(); i++) {
 			final PSDLayer child = options.getChild(i);
 			final LayerElement converted = new LayerElement();
+
 			convert(stack, child, converted, naming, result, scale_factor);
+			if (!converted.is_raster) {
+				stack.print();
+				Err.reportError(converted + "");
+			}
 			output.children.add(converted);
+			converted.position_x = converted.position_x - origin.getX();
+			converted.position_y = converted.position_y - origin.getY();
 		}
 
 	}
 
 	private static void extractButtonRaster (final LayersStack stack, final PSDLayer raster, final LayerElement output,
-		final ChildAssetsNameResolver naming, final SceneStructurePackingResult result, final double scale_factor) {
+		final ChildAssetsNameResolver naming, final SceneStructurePackingResult result, final double scale_factor,
+		final Float2 origin) {
 
 		{
 			final PSDLayer on_released = raster.findChildByName(TAGS.BUTTON_ON_RELEASED);
@@ -607,6 +629,8 @@ public class PSDtoScene2DConverter {
 				final LayerElement converted = new LayerElement();
 				convert(stack, on_released, converted, naming, result, scale_factor);
 				output.input_settings.on_released = converted;
+				converted.position_x = converted.position_x - origin.getX();
+				converted.position_y = converted.position_y - origin.getY();
 			}
 		}
 
@@ -616,6 +640,8 @@ public class PSDtoScene2DConverter {
 				final LayerElement converted = new LayerElement();
 				convert(stack, on_hover, converted, naming, result, scale_factor);
 				output.input_settings.on_hover = converted;
+				converted.position_x = converted.position_x - origin.getX();
+				converted.position_y = converted.position_y - origin.getY();
 			}
 		}
 
@@ -625,6 +651,8 @@ public class PSDtoScene2DConverter {
 				final LayerElement converted = new LayerElement();
 				convert(stack, on_press, converted, naming, result, scale_factor);
 				output.input_settings.on_press = converted;
+				converted.position_x = converted.position_x - origin.getX();
+				converted.position_y = converted.position_y - origin.getY();
 			}
 		}
 
@@ -634,6 +662,8 @@ public class PSDtoScene2DConverter {
 				final LayerElement converted = new LayerElement();
 				convert(stack, on_pressed, converted, naming, result, scale_factor);
 				output.input_settings.on_pressed = converted;
+				converted.position_x = converted.position_x - origin.getX();
+				converted.position_y = converted.position_y - origin.getY();
 			}
 		}
 
@@ -643,6 +673,8 @@ public class PSDtoScene2DConverter {
 				final LayerElement converted = new LayerElement();
 				convert(stack, on_release, converted, naming, result, scale_factor);
 				output.input_settings.on_release = converted;
+				converted.position_x = converted.position_x - origin.getX();
+				converted.position_y = converted.position_y - origin.getY();
 			}
 		}
 
@@ -874,6 +906,7 @@ public class PSDtoScene2DConverter {
 		output.position_x = position.getX() * scale_factor;
 		output.position_y = position.getY() * scale_factor;
 		output.width = position.getWidth() * scale_factor;
+		output.opacity = input.getOpacity();
 		output.height = position.getHeight() * scale_factor;
 		final String raster_name = naming.getPSDLayerName(input).toString();
 		output.raster_id = raster_name;
