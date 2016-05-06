@@ -522,17 +522,6 @@ public class PSDtoScene2DConverter {
 			}
 		}
 
-		{
-			final PSDLayer id = findChild(TAGS.ID, input);
-
-			if (id == null) {
-				throw new Error("Input @ID tag not found: " + input);
-			} else {
-				output.input_id = readParameter(id.getName(), TAGS.ID);
-				final PsdRepackerNameResolver naming = settings.getNaming();
-				output.input_id = naming.childInput(output.input_id).toString();
-			}
-		}
 		final double scale_factor = settings.getScaleFactor();
 		final PSDLayer origin_layer = findChild(TAGS.ORIGIN, input);
 		final Float2 origin = Geometry.newFloat2();
