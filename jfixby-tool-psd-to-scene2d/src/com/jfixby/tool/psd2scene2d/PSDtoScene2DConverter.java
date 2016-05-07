@@ -431,10 +431,10 @@ public class PSDtoScene2DConverter {
 
 	private static void convertProgress (final LayersStack stack, final PSDLayer input_parent, final LayerElement output,
 		final ConvertionSettings settings) {
-
+		Err.reportError("Not supported");
 		final String name = input_parent.getName();
 		output.is_hidden = !input_parent.isVisible();
-		output.is_progress = true;
+
 		output.name = name;
 
 		final PSDLayer progress = input_parent.findChildByNamePrefix(TAGS.PROGRESS);
