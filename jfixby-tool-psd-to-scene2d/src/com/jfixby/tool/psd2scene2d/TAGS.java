@@ -52,5 +52,6 @@ public class TAGS {
 	public static final String VALUE_BUTTON = "button";
 	public static final String VALUE_SWITCH = "switch";
 	public static final String VALUE_CUSTOM = "custom";
+	public static final String VALUE_TOUCH = "touch-area";
 
 }

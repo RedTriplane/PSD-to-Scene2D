@@ -543,6 +543,7 @@ public class PSDtoScene2DConverter {
 				output.input_settings.is_button = TAGS.VALUE_BUTTON.equalsIgnoreCase(type_value);
 				output.input_settings.is_switch = TAGS.VALUE_SWITCH.equalsIgnoreCase(type_value);
 				output.input_settings.is_custom = TAGS.VALUE_CUSTOM.equalsIgnoreCase(type_value);
+				output.input_settings.is_touch_area = TAGS.VALUE_TOUCH.equalsIgnoreCase(type_value);
 
 				// animation_settings.is_positions_modifyer_animation =
 				// ANIMATION_TYPE_POSITION_MODIFIER
@@ -557,6 +558,14 @@ public class PSDtoScene2DConverter {
 				extractButtonOptions(stack, raster, output, settings, origin);
 			} else if (output.input_settings.is_custom) {
 				extractButtonOptions(stack, raster, output, settings, origin);
+			} else if (output.input_settings.is_touch_area) {
+				L.d(output.input_settings);
+// final PSDLayer area = findChild(TAGS.AREA, input);
+// final PSDLayer dimentions = area.getChild(0);
+// extractTouchArea(stack, dimentions, output, settings, origin);
+			} else {
+				stack.print();
+				Err.reportError("Unknown input type: " + type);
 			}
 
 		}
@@ -624,6 +633,23 @@ public class PSDtoScene2DConverter {
 			converted.position_x = converted.position_x - origin.getX();
 			converted.position_y = converted.position_y - origin.getY();
 		}
+
+	}
+
+	private static void extractTouchArea (final LayersStack stack, final PSDLayer area, final LayerElement output,
+		final ConvertionSettings settings, final Float2 origin) {
+
+		final LayerElement converted = settings.newLayerElement();
+
+		convert(stack, area, converted, settings);
+		if (!converted.is_raster) {
+			stack.print();
+			Err.reportError(converted + "");
+		}
+		final SceneStructure structure = settings.getStructure();
+		output.children.addElement(converted, structure);
+		converted.position_x = converted.position_x - origin.getX();
+		converted.position_y = converted.position_y - origin.getY();
 
 	}
 
