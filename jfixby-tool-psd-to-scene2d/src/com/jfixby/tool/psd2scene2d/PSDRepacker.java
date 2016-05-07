@@ -68,6 +68,7 @@ public class PSDRepacker {
 		final boolean ignore_atlas = settings.getIgnoreAtlasFlag();
 		final int gemserk = settings.getGemserkPadding();
 		final int padding = settings.getPadding();
+		final int min_page_size = settings.getAtlasMinPageSize();
 		final boolean forceRasterDecomposition = settings.forceRasterDecomposition();
 
 		final FileSystem FS = psd_file.getFileSystem();
@@ -159,7 +160,7 @@ public class PSDRepacker {
 			final File atlas_folder = temp_folder.child("atlas");
 			atlas_folder.makeFolder();
 			final AtlasPackingResult atlas_result = packAtlas(atlas_folder, tiling_folder,
-				package_name.child("psd").child("raster").toString(), max_page_size, gemserk, padding);
+				package_name.child("psd").child("raster").toString(), max_page_size, min_page_size, gemserk, padding);
 
 			atlas_result.print();
 
@@ -264,7 +265,7 @@ public class PSDRepacker {
 	}
 
 	static private AtlasPackingResult packAtlas (final File atlas_folder, final File sprites, final String atlas_file_name,
-		final int max_page_size, final int gemserk, final int padding) throws IOException {
+		final int max_page_size, final int min_page_size, final int gemserk, final int padding) throws IOException {
 
 		final TexturePackingSpecs specs = TexturePacker.newPackingSpecs();
 
@@ -273,6 +274,7 @@ public class PSDRepacker {
 		specs.setInputRasterFolder(sprites);
 		specs.setDebugMode(!true);
 		specs.setMaxPageSize(max_page_size);
+		specs.setMinPageSize(min_page_size);
 		specs.setPadding(padding);
 
 		final Packer packer = TexturePacker.newPacker(specs);

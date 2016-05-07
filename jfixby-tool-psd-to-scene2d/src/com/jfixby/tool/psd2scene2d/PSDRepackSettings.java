@@ -17,6 +17,7 @@ public class PSDRepackSettings {
 	private int texturePadding;
 	private boolean forceRasterDecomposition;
 	private float imageQuality = 1;
+	private int altas_min_page_size;
 
 	public void setPSDFile (final File psd_file) {
 		this.psd_file = psd_file;
@@ -104,6 +105,14 @@ public class PSDRepackSettings {
 
 	public void setImageQuality (final float imageQuality) {
 		this.imageQuality = imageQuality;
+	}
+
+	public void setAtlasMinPageSize (final int altas_min_page_size) {
+		this.altas_min_page_size = altas_min_page_size;
+	}
+
+	public int getAtlasMinPageSize () {
+		return this.altas_min_page_size;
 	}
 
 }

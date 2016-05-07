@@ -615,8 +615,7 @@ public class PSDtoScene2DConverter {
 	private static void extractButtonOptions (final LayersStack stack, final PSDLayer options, final LayerElement output,
 		final ConvertionSettings settings, final Float2 origin) {
 		if (options == null) {
-			stack.print();
-			Debug.checkNull(options);
+			return;
 		}
 		for (int i = 0; i < options.numberOfChildren(); i++) {
 			final PSDLayer child = options.getChild(i);
