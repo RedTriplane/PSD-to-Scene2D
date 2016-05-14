@@ -22,6 +22,8 @@ import com.jfixby.cmns.api.image.ColorMap;
 import com.jfixby.cmns.api.image.ImageProcessing;
 import com.jfixby.cmns.api.io.IO;
 import com.jfixby.cmns.api.java.ByteArray;
+import com.jfixby.cmns.api.json.Json;
+import com.jfixby.cmns.api.json.JsonString;
 import com.jfixby.cmns.api.log.L;
 import com.jfixby.cmns.api.math.FloatMath;
 import com.jfixby.cmns.api.math.IntegerMath;
@@ -246,6 +248,9 @@ public class PSDRepacker {
 		final ByteArray data = IO.serialize(container);
 		final File file = final_output.child(root_file_name);
 		file.writeBytes(data);
+		final File debug_final_output = file.parent().child(file.getName() + ".json");
+		final JsonString debugString = Json.serializeToString(container);
+		debug_final_output.writeString(debugString.toString());
 
 		final File descriptor = file.parent().parent();
 
