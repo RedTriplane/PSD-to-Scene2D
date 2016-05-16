@@ -160,7 +160,7 @@ public class PSDtoScene2DConverter {
 				if (input.numberOfChildren() != 1) {
 					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
-				convertChildScene(input, output, settings);
+				convertChildScene(stack, input, output, settings);
 			} else if (shader_node != null) {
 				if (input.numberOfChildren() != 1) {
 					throw new Error("Annotation problem (only one child allowed). This is not an	 child scene node: " + input);
@@ -273,7 +273,7 @@ public class PSDtoScene2DConverter {
 		return id_string;
 	}
 
-	private static void convertChildScene (final PSDLayer input_parent, final LayerElement output,
+	private static void convertChildScene (final LayersStack stack, final PSDLayer input_parent, final LayerElement output,
 		final ConvertionSettings settings) {
 
 		final String name = input_parent.getName();
@@ -294,13 +294,14 @@ public class PSDtoScene2DConverter {
 
 		final PSDLayer origin = input.findChildByNamePrefix(TAGS.ORIGIN);
 		if (origin != null) {
-
-			final double scale_factor = settings.getScaleFactor();
-			output.child_scene_settings.frame_position_x = origin.getRaster().getPosition().getX() * scale_factor;
-			output.child_scene_settings.frame_position_y = origin.getRaster().getPosition().getY() * scale_factor;
-
-			output.child_scene_settings.frame_width = origin.getRaster().getDimentions().getWidth();
-			output.child_scene_settings.frame_height = origin.getRaster().getDimentions().getHeight();
+			stack.print();
+			Err.reportError("Tag deprecated: <" + TAGS.ORIGIN + ">");
+// final double scale_factor = settings.getScaleFactor();
+// output.child_scene_settings.frame_position_x = origin.getRaster().getPosition().getX() * scale_factor;
+// output.child_scene_settings.frame_position_y = origin.getRaster().getPosition().getY() * scale_factor;
+//
+// output.child_scene_settings.frame_width = origin.getRaster().getDimentions().getWidth();
+// output.child_scene_settings.frame_height = origin.getRaster().getDimentions().getHeight();
 		}
 		{
 			final PSDLayer id = findChild(TAGS.ID, input);
