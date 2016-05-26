@@ -184,7 +184,7 @@ public class PSDRepacker {
 			packed_rasters.addAll(atlas_result.listPackedAssets());
 
 			final File atlasPackageFolder = atlas_output.parent();
-			PackageUtils.producePackageDescriptor(atlasPackageFolder, StandardPackageFormats.libGDX.Atlas_GWT, "1.0", packed_rasters,
+			PackageUtils.producePackageDescriptor(atlasPackageFolder, StandardPackageFormats.libGDX.Atlas, "1.0", packed_rasters,
 				Collections.newList(), atlas_name);
 
 			// requred_rasters.print("requred_rasters");
