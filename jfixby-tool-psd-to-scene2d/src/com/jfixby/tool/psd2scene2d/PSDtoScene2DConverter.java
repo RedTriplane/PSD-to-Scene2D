@@ -515,7 +515,7 @@ public class PSDtoScene2DConverter {
 		final PSDLayer id = findChild(TAGS.ID, input);
 		if (id != null) {
 			stack.print();
-			Err.reportError("Tag depricated: <" + TAGS.ID + ">");
+// Err.reportError("Tag depricated: <" + TAGS.ID + ">");
 		}
 
 		{
