@@ -13,6 +13,7 @@ import com.jfixby.cmns.api.collections.Map;
 import com.jfixby.cmns.api.collections.Set;
 import com.jfixby.cmns.api.debug.Debug;
 import com.jfixby.cmns.api.desktop.ImageAWT;
+import com.jfixby.cmns.api.err.Err;
 import com.jfixby.cmns.api.file.File;
 import com.jfixby.cmns.api.file.FileSystem;
 import com.jfixby.cmns.api.file.LocalFileSystem;
@@ -51,6 +52,7 @@ import com.jfixby.tools.gdx.texturepacker.api.AtlasPackingResult;
 import com.jfixby.tools.gdx.texturepacker.api.Packer;
 import com.jfixby.tools.gdx.texturepacker.api.TexturePacker;
 import com.jfixby.tools.gdx.texturepacker.api.TexturePackingSpecs;
+import com.jfixby.tools.gdx.texturepacker.api.indexed.IndexedCompressor;
 
 public class PSDRepacker {
 
@@ -72,6 +74,7 @@ public class PSDRepacker {
 		final int padding = settings.getPadding();
 		final int min_page_size = settings.getAtlasMinPageSize();
 		final boolean forceRasterDecomposition = settings.forceRasterDecomposition();
+		final boolean useIndexCompression = settings.useIndexCompression();
 
 		final FileSystem FS = psd_file.getFileSystem();
 
@@ -175,7 +178,24 @@ public class PSDRepacker {
 			atlas_output.makeFolder();
 			related_folders.add(atlas_output);
 			atlas_output.clearFolder();
-			FS.copyFolderContentsToFolder(atlas_folder, atlas_output);
+// FS.copyFolderContentsToFolder(atlas_folder, atlas_output);
+			Collections.scanCollection(atlas_folder.listChildren(), (file, index) -> {
+				try {
+					if (!useIndexCompression || (!file.extensionIs("png"))) {
+						FS.copyFileToFolder(file, atlas_output);
+					} else {
+						final String file_name = file.getName();
+						L.d("compressing", file_name);
+						final File outputPng = atlas_output.child(file_name);
+						final File originalOutputPng = atlas_output.child(file.nameWithoutExtension() + ".original.png");
+						IndexedCompressor.compressFile(file, outputPng);
+						FS.copyFileToFile(file, originalOutputPng);
+					}
+				} catch (final Exception e) {
+					Err.reportError(e);
+				}
+			});
+
 			// Collection<AssetID> packed_rasters = atlas_result
 			// .listPackedAssets();
 

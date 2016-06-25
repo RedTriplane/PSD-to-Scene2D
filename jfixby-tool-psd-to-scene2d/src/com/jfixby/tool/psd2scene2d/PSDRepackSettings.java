@@ -18,6 +18,7 @@ public class PSDRepackSettings {
 	private boolean forceRasterDecomposition;
 	private float imageQuality = 1;
 	private int altas_min_page_size;
+	private boolean useIndexCompression;
 
 	public void setPSDFile (final File psd_file) {
 		this.psd_file = psd_file;
@@ -113,6 +114,14 @@ public class PSDRepackSettings {
 
 	public int getAtlasMinPageSize () {
 		return this.altas_min_page_size;
+	}
+
+	public void setUseIndexCompression (final boolean useIndexCompression) {
+		this.useIndexCompression = useIndexCompression;
+	}
+
+	public boolean useIndexCompression () {
+		return this.useIndexCompression;
 	}
 
 }
