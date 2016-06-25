@@ -25,8 +25,8 @@ public class PSDRepackerResult {
 		this.compressedPNG.getLast().print();
 	}
 
-	public void print () {
-		this.compressedPNG.print("compressed files");
+	public Collection<CompressionInfo> listCompressions () {
+		return this.compressedPNG;
 	}
 
 }
