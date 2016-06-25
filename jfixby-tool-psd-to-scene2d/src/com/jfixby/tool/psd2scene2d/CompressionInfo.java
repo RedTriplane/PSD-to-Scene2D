@@ -21,7 +21,7 @@ public class CompressionInfo {
 
 	@Override
 	public String toString () {
-		return "FileCompressed: " + this.file_name + " ratio: " + this.compression + "";
+		return "FileCompressed: " + this.file_name + " ratio: " + this.compression + "%";
 	}
 
 	public void print () {
