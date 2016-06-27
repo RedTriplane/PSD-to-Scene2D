@@ -40,6 +40,7 @@ import com.jfixby.r3.api.resources.StandardPackageFormats;
 import com.jfixby.r3.ext.api.scene2d.srlz.Scene2DPackage;
 import com.jfixby.rana.api.pkg.fs.PackageDescriptor;
 import com.jfixby.red.engine.core.resources.PackageUtils;
+import com.jfixby.red.filesystem.virtual.InMemoryFileSystem;
 import com.jfixby.texture.slicer.api.SlicesCompositionInfo;
 import com.jfixby.texture.slicer.api.SlicesCompositionsContainer;
 import com.jfixby.texture.slicer.api.TextureSlicer;
@@ -75,13 +76,17 @@ public class PSDRepacker {
 		final int min_page_size = settings.getAtlasMinPageSize();
 		final boolean forceRasterDecomposition = settings.forceRasterDecomposition();
 		final boolean useIndexCompression = settings.useIndexCompression();
+		final boolean useInMemoryFileSystem = settings.useInMemoryFileSystem();
 
-		final FileSystem FS = psd_file.getFileSystem();
-
-		// File tmp_mount = repacking_output.parent().child("temp");
-// final File tmp_mount = repacking_output;
-// tmp_mount.makeFolder();
-		final File tmp = LocalFileSystem.ApplicationHome().child("tmp");
+		final File tmp;
+		final FileSystem FS;
+		if (useInMemoryFileSystem) {
+			FS = new InMemoryFileSystem();
+			tmp = FS.ROOT().child("tmp");
+		} else {
+			FS = psd_file.getFileSystem();
+			tmp = LocalFileSystem.ApplicationHome().child("tmp");
+		}
 		tmp.makeFolder();
 		final TempFolder temp_folder_handler = FileCache.createTempFolder(tmp);
 		final File temp_folder = temp_folder_handler.getRoot();

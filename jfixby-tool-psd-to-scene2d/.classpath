@@ -16,5 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-tool-texture-bleed-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-tool-texture-compressor-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-tool-texture-compressor-red"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-cmns-red"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

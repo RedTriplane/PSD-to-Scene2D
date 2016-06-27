@@ -19,6 +19,7 @@ public class PSDRepackSettings {
 	private float imageQuality = 1;
 	private int altas_min_page_size;
 	private boolean useIndexCompression;
+	private boolean useInMemoryFileSystem;
 
 	public void setPSDFile (final File psd_file) {
 		this.psd_file = psd_file;
@@ -122,6 +123,14 @@ public class PSDRepackSettings {
 
 	public boolean useIndexCompression () {
 		return this.useIndexCompression;
+	}
+
+	public void setUseInMemoryFileSystem (final boolean useInMemoryFileSystem) {
+		this.useInMemoryFileSystem = useInMemoryFileSystem;
+	}
+
+	public boolean useInMemoryFileSystem () {
+		return this.useInMemoryFileSystem;
 	}
 
 }
