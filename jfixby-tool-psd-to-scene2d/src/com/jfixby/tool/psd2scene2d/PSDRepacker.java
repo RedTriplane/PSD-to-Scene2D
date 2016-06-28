@@ -77,6 +77,7 @@ public class PSDRepacker {
 		final boolean forceRasterDecomposition = settings.forceRasterDecomposition();
 		final boolean useIndexCompression = settings.useIndexCompression();
 		final boolean useInMemoryFileSystem = settings.useInMemoryFileSystem();
+		final boolean usePNGQuant = settings.usePNGQuant();
 
 		final File tmp;
 		final FileSystem FS;
