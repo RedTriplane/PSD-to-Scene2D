@@ -55,6 +55,9 @@ import com.jfixby.tools.gdx.texturepacker.api.TexturePacker;
 import com.jfixby.tools.gdx.texturepacker.api.TexturePackingSpecs;
 import com.jfixby.tools.gdx.texturepacker.api.indexed.IndexedCompressor;
 
+import pngquant.java.api.CompressionResult;
+import pngquant.java.api.PNGQuant;
+
 public class PSDRepacker {
 
 	public static PSDRepackerResult repackPSD (final PSDRepackSettings settings, final PSDRepackingStatus handler)
@@ -171,7 +174,7 @@ public class PSDRepacker {
 			final File atlas_folder = temp_folder.child("atlas");
 			atlas_folder.makeFolder();
 			final AtlasPackingResult atlas_result = packAtlas(atlas_folder, tiling_folder,
-				package_name.child("psd").child("raster").toString(), max_page_size, min_page_size, gemserk, padding);
+				package_name.child("psd").child("raster").toString(), max_page_size, min_page_size, padding);
 
 			atlas_result.print();
 
@@ -201,12 +204,27 @@ public class PSDRepacker {
 
 					}
 					if (usePNGQuant) {
-						PNGQuant.compressFile(outputPng, outputPng);
+						final CompressionResult PNGQuantresult = PNGQuant.compress(outputPng, outputPng);
+						if (!PNGQuantresult.isOK()) {
+						}
+						PNGQuantresult.print("" + outputPng);
+
 					}
 				} catch (final Exception e) {
 					Err.reportError(e);
 				}
 			});
+
+			if (gemserk > 0) {
+				final TextureBleedSpecs bleedSpecs = TextureBleed.newSpecs();
+				bleedSpecs.setDebugMode(!true);
+				bleedSpecs.setPaddingSize(gemserk);
+				final File pagesFolder = atlas_output;
+				L.d("Gemserking", pagesFolder);
+				bleedSpecs.setInputFolder(pagesFolder);
+				final TextureBleedResult gemserk_result = TextureBleed.process(bleedSpecs);
+				gemserk_result.print();
+			}
 
 			// Collection<AssetID> packed_rasters = atlas_result
 			// .listPackedAssets();
@@ -302,7 +320,7 @@ public class PSDRepacker {
 	}
 
 	static private AtlasPackingResult packAtlas (final File atlas_folder, final File sprites, final String atlas_file_name,
-		final int max_page_size, final int min_page_size, final int gemserk, final int padding) throws IOException {
+		final int max_page_size, final int min_page_size, final int padding) throws IOException {
 
 		final TexturePackingSpecs specs = TexturePacker.newPackingSpecs();
 
@@ -317,17 +335,6 @@ public class PSDRepacker {
 		final Packer packer = TexturePacker.newPacker(specs);
 
 		final AtlasPackingResult result = packer.pack();
-
-		if (gemserk > 0) {
-			final TextureBleedSpecs bleedSpecs = TextureBleed.newSpecs();
-			bleedSpecs.setDebugMode(!true);
-			bleedSpecs.setPaddingSize(gemserk);
-			final File pagesFolder = result.getAtlasOutputFile().parent();
-			L.d("Gemserking", pagesFolder);
-			bleedSpecs.setInputFolder(pagesFolder);
-			final TextureBleedResult gemserk_result = TextureBleed.process(bleedSpecs);
-			gemserk_result.print();
-		}
 
 		return result;
 	}
