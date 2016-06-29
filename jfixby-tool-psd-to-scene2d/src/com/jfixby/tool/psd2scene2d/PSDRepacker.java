@@ -187,19 +187,21 @@ public class PSDRepacker {
 
 			Collections.scanCollection(atlas_folder.listChildren(), (file, index) -> {
 				try {
+					final String file_name = file.getName();
+					final File outputPng = atlas_output.child(file_name);
 					if (!useIndexCompression || (!file.extensionIs("png"))) {
-						FS.copyFileToFolder(file, atlas_output);
+						FS.copyFileToFile(file, outputPng);
 					} else {
-						final String file_name = file.getName();
 						L.d("compressing", file_name);
-						final File outputPng = atlas_output.child(file_name);
-
 						IndexedCompressor.compressFile(file, outputPng);
 						final long originalSize = file.getSize();
 						final long newSize = outputPng.getSize();
 
 						result.addCompressionInfo(file_name, originalSize, newSize);
 
+					}
+					if (usePNGQuant) {
+						PNGQuant.compressFile(outputPng, outputPng);
 					}
 				} catch (final Exception e) {
 					Err.reportError(e);
