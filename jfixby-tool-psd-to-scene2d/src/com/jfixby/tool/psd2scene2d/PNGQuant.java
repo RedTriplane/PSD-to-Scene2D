@@ -1,20 +1,58 @@
 
 package com.jfixby.tool.psd2scene2d;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import com.jfixby.cmns.api.file.File;
 import com.jfixby.cmns.api.log.L;
 
 public class PNGQuant {
-	static String INPUT_FILE_NAME = "INPUT_FILE_NAME";
-	static String OUTPUT_FILE_NAME = "OUTPUT_FILE_NAME";
-	static String PNGQuant_COMMAND_TEMPLATE = "pngquant --force --output " + OUTPUT_FILE_NAME
-		+ " --skip-if-larger --verbose --speed 1 --quality 80-90 " + INPUT_FILE_NAME;
 
 	public static void compressFile (final File inputFile, final File outputFile) {
 		final String inputFileName = inputFile.toJavaFile().getAbsolutePath();
 		final String outputFileName = outputFile.toJavaFile().getAbsolutePath();
-		final String command = PNGQuant_COMMAND_TEMPLATE.replaceAll(INPUT_FILE_NAME, inputFileName).replaceAll(OUTPUT_FILE_NAME,
-			outputFileName);
-		L.d("", command);
+		final String command = "pngquant.exe --force --output " + outputFileName
+			+ " --skip-if-larger --verbose --speed 1 --quality 80-90 " + inputFileName;
+// L.d("", command);
+// executeCommand(command);
+// executeCommand("pngquant.exe");
+		executeCommand(command.split(" "));
+	}
+
+	static private boolean executeCommand (final String... command) {
+		L.d("executeCommand", command);
+
+		final StringBuilder output = new StringBuilder();
+		boolean success = false;
+		final String testString = "writing 256-color image";
+		try {
+
+			final ProcessBuilder ps = new ProcessBuilder(command);
+			ps.redirectErrorStream(true);
+			final Process p = ps.start();
+			final InputStream is = p.getInputStream();
+			final InputStreamReader reader = new InputStreamReader(is);
+			final BufferedReader buff = new BufferedReader(reader);
+
+			while (true) {
+				final String last_line = buff.readLine();
+				if (last_line == null) {
+					break;
+				}
+				if (last_line.contains(testString)) {
+					success = true;
+				}
+				L.d(last_line);
+			}
+
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+
+		final String result = output.toString();
+		L.d(result);
+		return success;
 	}
 }
