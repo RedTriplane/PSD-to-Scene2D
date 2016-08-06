@@ -258,18 +258,19 @@ public class PSDtoScene2DConverter {
 
 	private static String readParameter (final PSDLayer layer, final String id) {
 		String id_string = readParameter(layer.getName(), id);
-		if (id_string.length() > 0) {
-			return id_string;
-		}
+// if (id_string.length() > 0) {
+// return id_string;
+// }
 		PSDLayer next = layer;
-		id_string = "";
-		do {
+// id_string = "";
+		while (next.numberOfChildren() > 0) {
 			next = next.getChild(0);
 			id_string = id_string + next.getName();
 			if (next.numberOfChildren() > 0) {
 				id_string = id_string + ".";
 			}
-		} while (next.numberOfChildren() > 0);
+		}
+		;
 		return id_string;
 	}
 
@@ -380,21 +381,23 @@ public class PSDtoScene2DConverter {
 		}
 		{
 			final PSDLayer text_node = input.findChildByNamePrefix(TAGS.TEXT);
+			L.d("text_node", text_node);
 			if (text_node != null) {
-// final PSDLayer id = findChild(TAGS.ID, text_node);
-// if (id == null) {
-// throw new Error("Missing tag <@" + TAGS.ID + ">");
-// } else {
-// stack.print();
-// throw new Error("Missing tag <@" + TAGS.ID + ">");
-// final String text_value_asset_id_string = readParameter(id.getName(), TAGS.ID);
-// final AssetID text_value_asset_id = naming.childText(text_value_asset_id_string);
-// output.text_settings.text_value_asset_id = text_value_asset_id.toString();
-// result.addRequiredAsset(text_value_asset_id, Collections.newList(input));
-// }
-// AssetID child_scene_asset_id = null;
-// result.addRequiredRaster(child_scene_asset_id,
-// JUtils.newList(input_parent, input, background));
+				final PSDLayer id = findChild(TAGS.ID, text_node);
+				if (id == null) {
+					throw new Error("Missing tag <@" + TAGS.ID + ">");
+				} else {
+					final String text_value_asset_id_string = readParameter(id, TAGS.ID);
+					final PsdRepackerNameResolver naming = settings.getNaming();
+// final AssetID text_value_asset_id = Names.newAssetID(text_value_asset_id_string);
+					final AssetID text_value_asset_id = naming.childText(text_value_asset_id_string);
+
+					output.text_settings.text_value_asset_id = text_value_asset_id.toString();
+					final SceneStructurePackingResult result = settings.getResult();
+					result.addRequiredAsset(text_value_asset_id, Collections.newList(input));
+				}
+// final AssetID child_scene_asset_id = null;
+// result.addRequiredRaster(child_scene_asset_id, JUtils.newList(input_parent, input, background));
 			}
 		}
 		final double scale_factor = settings.getScaleFactor();
