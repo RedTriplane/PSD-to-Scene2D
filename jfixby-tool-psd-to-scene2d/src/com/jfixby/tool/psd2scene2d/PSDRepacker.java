@@ -188,7 +188,7 @@ public class PSDRepacker {
 			related_folders.add(atlas_output);
 			atlas_output.clearFolder();
 
-			Collections.scanCollection(atlas_folder.listChildren(), (file, index) -> {
+			Collections.scanCollection(atlas_folder.listDirectChildren(), (file, index) -> {
 				try {
 					final String file_name = file.getName();
 					final File outputPng = atlas_output.child(file_name);
