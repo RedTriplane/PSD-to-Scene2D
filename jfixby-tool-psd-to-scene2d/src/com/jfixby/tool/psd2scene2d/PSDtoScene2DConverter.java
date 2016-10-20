@@ -265,12 +265,8 @@ public class PSDtoScene2DConverter {
 // id_string = "";
 		while (next.numberOfChildren() > 0) {
 			next = next.getChild(0);
-			id_string = id_string + next.getName();
-			if (next.numberOfChildren() > 0) {
-				id_string = id_string + ".";
-			}
+			id_string = id_string + "." + next.getName();
 		}
-		;
 		return id_string;
 	}
 
