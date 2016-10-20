@@ -389,8 +389,8 @@ public class PSDtoScene2DConverter {
 				} else {
 					final String text_value_asset_id_string = readParameter(id, TAGS.ID);
 					final PsdRepackerNameResolver naming = settings.getNaming();
-// final AssetID text_value_asset_id = Names.newAssetID(text_value_asset_id_string);
-					final AssetID text_value_asset_id = naming.childText(text_value_asset_id_string);
+					final AssetID text_value_asset_id = Names.newAssetID(text_value_asset_id_string);
+// final AssetID text_value_asset_id = naming.childText(text_value_asset_id_string);
 
 					output.text_settings.text_value_asset_id = text_value_asset_id.toString();
 					final SceneStructurePackingResult result = settings.getResult();
