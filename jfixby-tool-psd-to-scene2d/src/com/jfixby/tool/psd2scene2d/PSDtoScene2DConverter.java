@@ -144,6 +144,8 @@ public class PSDtoScene2DConverter {
 
 		if (input.isFolder()) {
 			stack.push(input);
+			final String name = input.getName();
+// L.d("convert layer", name);
 			final PSDLayer animation_node = input.findChildByNamePrefix(TAGS.ANIMATION);
 			final PSDLayer childscene_node = input.findChildByNamePrefix(TAGS.CHILD_SCENE);
 			final PSDLayer text_node = input.findChildByNamePrefix(TAGS.R3_TEXT);
