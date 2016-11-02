@@ -116,8 +116,9 @@ public class PSDtoScene2DConverter {
 		final PSDLayer area = camera_layer.findChildByNamePrefix(TAGS.AREA);
 		final PSDLayer mode = camera_layer.findChildByNamePrefix(TAGS.MODE);
 		if (area == null) {
-			stack.print();
-			throw new Error("Tag <" + TAGS.AREA + "> not found.");
+// stack.print();
+// throw new Error("Tag <" + TAGS.AREA + "> not found.");
+			cameraSettings.mode = MODE.FILL_SCREEN;
 		}
 
 		if (area != null) {
@@ -462,6 +463,7 @@ public class PSDtoScene2DConverter {
 		final ConvertionSettings settings) {
 		output.parallax_settings = new ParallaxSettings();
 		output.name = layer.getName();
+		output.is_sublayer = true;
 		for (int i = 0; i < layer.numberOfChildren(); i++) {
 			final PSDLayer child = layer.getChild(i);
 			final String childName = child.getName();
