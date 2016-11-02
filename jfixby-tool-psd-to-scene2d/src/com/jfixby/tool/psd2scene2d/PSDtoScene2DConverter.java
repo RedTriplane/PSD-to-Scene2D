@@ -27,6 +27,7 @@ import com.jfixby.r3.ext.api.scene2d.srlz.CameraSettings.MODE;
 import com.jfixby.r3.ext.api.scene2d.srlz.ChildSceneSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.InputSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.LayerElement;
+import com.jfixby.r3.ext.api.scene2d.srlz.ParallaxSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.ProgressSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.RASTER_BLEND_MODE;
 import com.jfixby.r3.ext.api.scene2d.srlz.Scene2DPackage;
@@ -152,6 +153,7 @@ public class PSDtoScene2DConverter {
 			final PSDLayer shader_node = input.findChildByNamePrefix(TAGS.R3_SHADER);
 			final PSDLayer user_input = input.findChildByNamePrefix(TAGS.INPUT);
 			final PSDLayer progress = input.findChildByNamePrefix(TAGS.PROGRESS);
+			final PSDLayer parallax = input.findChildByNamePrefix(TAGS.PARALLAX);
 			// PSDLayer events_node = input.findChild(EVENT);
 			if (animation_node != null) {
 				if (input.numberOfChildren() != 1) {
@@ -183,6 +185,11 @@ public class PSDtoScene2DConverter {
 					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
 				convertProgress(stack, input, output, settings);
+			} else if (parallax != null) {
+				if (input.numberOfChildren() != 1) {
+					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
+				}
+				convertParallax(stack, input, output, settings);
 			} else if (false) {
 				if (input.numberOfChildren() != 1) {
 					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
@@ -429,6 +436,66 @@ public class PSDtoScene2DConverter {
 				output.text_settings.padding = (float)(Float.parseFloat(padding_string) * scale_factor);
 			}
 		}
+	}
+
+	private static void convertParallax (final LayersStack stack, final PSDLayer input_parent, final LayerElement output,
+		final ConvertionSettings settings) {
+
+		final String name = input_parent.getName();
+		output.is_hidden = !input_parent.isVisible();
+		output.name = name;
+
+		output.is_parallax = true;
+
+		final PSDLayer content = input_parent.findChildByNamePrefix(TAGS.PARALLAX);
+		final SceneStructure structure = settings.getStructure();
+		for (int i = 0; i < content.numberOfChildren(); i++) {
+			final PSDLayer child = content.getChild(i);
+			final LayerElement layer = settings.newLayerElement();
+			convertParallaxLayer(stack, child, layer, settings);
+			output.children.addElement(layer, structure);
+		}
+
+	}
+
+	private static void convertParallaxLayer (final LayersStack stack, final PSDLayer layer, final LayerElement output,
+		final ConvertionSettings settings) {
+		output.parallax_settings = new ParallaxSettings();
+		output.name = layer.getName();
+		for (int i = 0; i < layer.numberOfChildren(); i++) {
+			final PSDLayer child = layer.getChild(i);
+			final String childName = child.getName();
+			if (childName.startsWith("@parallax_settings")) {
+				readParallaxSettings(output.parallax_settings, child);
+// L.d("skip", childName);
+			} else {
+				final LayerElement childElement = settings.newLayerElement();
+				final SceneStructure structure = settings.getStructure();
+				convert(stack, child, childElement, settings);
+				output.children.addElement(childElement, structure);
+			}
+		}
+	}
+
+	private static void readParallaxSettings (final ParallaxSettings parallax_settings, final PSDLayer layer) {
+		final PSDLayer mx = layer.findChildByNamePrefix(TAGS.PARALLAX_MULTIPLIER_X);
+		final PSDLayer my = layer.findChildByNamePrefix(TAGS.PARALLAX_MULTIPLIER_Y);
+		final PSDLayer mz = layer.findChildByNamePrefix(TAGS.PARALLAX_MULTIPLIER_Z);
+
+		parallax_settings.multiplier_x = 1.0f;
+		parallax_settings.multiplier_y = 0.0f;
+		parallax_settings.multiplier_z = 1.0f;
+
+		if (mx != null) {
+			parallax_settings.multiplier_x = Float.parseFloat(readParameter(mx, TAGS.PARALLAX_MULTIPLIER_X));
+		}
+		if (my != null) {
+			parallax_settings.multiplier_x = Float.parseFloat(readParameter(my, TAGS.PARALLAX_MULTIPLIER_Y));
+		}
+		if (mz != null) {
+			parallax_settings.multiplier_x = Float.parseFloat(readParameter(mz, TAGS.PARALLAX_MULTIPLIER_Z));
+		}
+
 	}
 
 	private static void convertProgress (final LayersStack stack, final PSDLayer input_parent, final LayerElement output,
@@ -838,7 +905,7 @@ public class PSDtoScene2DConverter {
 		if (animation_settings.is_positions_modifyer_animation) {
 			final PSDLayer anchors = findChild(TAGS.ANIMATION_ANCHORS, input);
 			Debug.checkNull("frames", anchors);
-			animation_settings.anchors = new Vector<Anchor>();
+			animation_settings.anchors = new Vector<>();
 			final double scale_factor = settings.getScaleFactor();
 			for (int i = 0; i < anchors.numberOfChildren(); i++) {
 				final PSDLayer anchor_layer = anchors.getChild(i);
@@ -887,7 +954,7 @@ public class PSDtoScene2DConverter {
 
 	private static void packAnimationEvents (final PSDLayer events_list, final ActionsGroup e_list,
 		final ChildAssetsNameResolver naming) {
-		e_list.actions = new Vector<Action>();
+		e_list.actions = new Vector<>();
 		for (int i = 0; i < events_list.numberOfChildren(); i++) {
 			final PSDLayer element = events_list.getChild(i);
 			String event_id = readParameter(element, TAGS.ID);

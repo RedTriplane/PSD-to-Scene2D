@@ -9,6 +9,7 @@ public class TAGS {
 	public static final String R3_TEXT = "@r3.text";
 	public static final String INPUT = "@r3.input";
 	public static final String PROGRESS = "@progress";
+	public static final String PARALLAX = "@parallax";
 	public static final String RASTER = "@raster";
 	public static final String STRUCTURE_NAME = "@name=";
 	public static final String CAMERA = "@camera";
@@ -19,6 +20,11 @@ public class TAGS {
 	public static final String AUTOSTART = "@autostart=";
 	public static final String ID = "@id=";
 	public static final String SIZE = "@size=";
+
+	public static final String PARALLAX_MULTIPLIER_X = "@mX=";
+	public static final String PARALLAX_MULTIPLIER_Y = "@mY=";
+	public static final String PARALLAX_MULTIPLIER_Z = "@mZ=";
+
 	public static final String NAME = "@name=";
 	public static final String MARGIN = "@margin=";
 	public static final String PADDING = "@padding=";
