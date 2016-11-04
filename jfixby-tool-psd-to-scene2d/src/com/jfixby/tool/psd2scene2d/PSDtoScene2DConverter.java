@@ -449,9 +449,24 @@ public class PSDtoScene2DConverter {
 		output.is_parallax = true;
 
 		final PSDLayer content = input_parent.findChildByNamePrefix(TAGS.PARALLAX);
+
+		final double scale_factor = settings.getScaleFactor();
+		final PSDLayer origin_layer = findChild(TAGS.ORIGIN, content);
+		final Float2 origin = Geometry.newFloat2();
+		if (origin_layer != null) {
+			final PSDRaster raster = origin_layer.getRaster();
+			origin.setXY(raster.getPosition().getX() * scale_factor, raster.getPosition().getY() * scale_factor);
+		}
+
+		output.position_x = origin.getX();
+		output.position_y = origin.getY();
+
 		final SceneStructure structure = settings.getStructure();
 		for (int i = 0; i < content.numberOfChildren(); i++) {
 			final PSDLayer child = content.getChild(i);
+			if (child == origin_layer) {
+				continue;
+			}
 			final LayerElement layer = settings.newLayerElement();
 			convertParallaxLayer(stack, child, layer, settings);
 			output.children.addElement(layer, structure);
@@ -464,6 +479,7 @@ public class PSDtoScene2DConverter {
 		output.parallax_settings = new ParallaxSettings();
 		output.name = layer.getName();
 		output.is_sublayer = true;
+
 		for (int i = 0; i < layer.numberOfChildren(); i++) {
 			final PSDLayer child = layer.getChild(i);
 			final String childName = child.getName();
@@ -492,10 +508,10 @@ public class PSDtoScene2DConverter {
 			parallax_settings.multiplier_x = Float.parseFloat(readParameter(mx, TAGS.PARALLAX_MULTIPLIER_X));
 		}
 		if (my != null) {
-			parallax_settings.multiplier_x = Float.parseFloat(readParameter(my, TAGS.PARALLAX_MULTIPLIER_Y));
+			parallax_settings.multiplier_y = Float.parseFloat(readParameter(my, TAGS.PARALLAX_MULTIPLIER_Y));
 		}
 		if (mz != null) {
-			parallax_settings.multiplier_x = Float.parseFloat(readParameter(mz, TAGS.PARALLAX_MULTIPLIER_Z));
+			parallax_settings.multiplier_z = Float.parseFloat(readParameter(mz, TAGS.PARALLAX_MULTIPLIER_Z));
 		}
 
 	}

@@ -455,7 +455,7 @@ public class PSDRepacker {
 		}
 
 		if (save_raster) {
-			L.d("writing: " + output_file);
+			L.d("writing: " + output_file + " " + raster + " scale_factor=" + scale_factor);
 			ImageAWT.writeToFile(out, output_file, "png");
 		}
 
