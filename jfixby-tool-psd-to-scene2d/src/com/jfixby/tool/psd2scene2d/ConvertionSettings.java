@@ -1,6 +1,10 @@
 
 package com.jfixby.tool.psd2scene2d;
 
+import com.jfixby.cmns.api.collections.Collections;
+import com.jfixby.cmns.api.collections.List;
+import com.jfixby.cmns.api.floatn.Float2;
+import com.jfixby.cmns.api.geometry.Geometry;
 import com.jfixby.r3.ext.api.scene2d.srlz.LayerElement;
 import com.jfixby.r3.ext.api.scene2d.srlz.LayerElementFactory;
 import com.jfixby.r3.ext.api.scene2d.srlz.SceneStructure;
@@ -47,6 +51,24 @@ public class ConvertionSettings {
 
 	public SceneStructure getStructure () {
 		return this.factory.getStructure();
+	}
+
+	final List<Float2> offsetStack = Collections.newList();
+	final Float2 currentOffset = Geometry.newFloat2();
+
+	public Float2 getCurrentOffset () {
+		return this.currentOffset;
+	}
+
+	public void addOffset (final Float2 layerOffset) {
+		this.offsetStack.add(layerOffset);
+		this.currentOffset.add(layerOffset);
+	}
+
+	public Float2 removeOffset () {
+		final Float2 last = this.offsetStack.removeLast();
+		this.currentOffset.subtract(last);
+		return last;
 	}
 
 }

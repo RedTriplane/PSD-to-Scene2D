@@ -16,6 +16,7 @@ import com.jfixby.cmns.api.log.L;
 import com.jfixby.cmns.api.math.FloatMath;
 import com.jfixby.psd.unpacker.api.PSDLayer;
 import com.jfixby.psd.unpacker.api.PSDRaster;
+import com.jfixby.psd.unpacker.api.PSDRasterDimentions;
 import com.jfixby.psd.unpacker.api.PSDRasterPosition;
 import com.jfixby.r3.api.shader.srlz.SHADER_PARAMETERS;
 import com.jfixby.r3.ext.api.scene2d.srlz.Action;
@@ -457,9 +458,22 @@ public class PSDtoScene2DConverter {
 			final PSDRaster raster = origin_layer.getRaster();
 			origin.setXY(raster.getPosition().getX() * scale_factor, raster.getPosition().getY() * scale_factor);
 		}
+		final PSDLayer frame_layer = findChild(TAGS.FRAME, content);
 
 		output.position_x = origin.getX();
 		output.position_y = origin.getY();
+
+		if (frame_layer != null) {
+			final PSDRaster frame = frame_layer.getRaster();
+			final PSDRasterPosition position = frame.getPosition();
+			final PSDRasterDimentions dim = frame.getDimentions();
+			output.origin_relative_x = -(position.getX() - origin.getX()) / dim.getWidth();
+			output.origin_relative_y = -(position.getY() - origin.getY()) / dim.getHeight();
+
+			output.width = dim.getWidth() * scale_factor;
+			output.height = dim.getHeight() * scale_factor;
+
+		}
 
 		final SceneStructure structure = settings.getStructure();
 		for (int i = 0; i < content.numberOfChildren(); i++) {
@@ -467,53 +481,122 @@ public class PSDtoScene2DConverter {
 			if (child == origin_layer) {
 				continue;
 			}
+			if (child == frame_layer) {
+				continue;
+			}
 			final LayerElement layer = settings.newLayerElement();
-			convertParallaxLayer(stack, child, layer, settings);
+			convertParallaxLayer(stack, child, layer, settings, frame_layer);
 			output.children.addElement(layer, structure);
 		}
 
 	}
 
 	private static void convertParallaxLayer (final LayersStack stack, final PSDLayer layer, final LayerElement output,
-		final ConvertionSettings settings) {
+		final ConvertionSettings settings, final PSDLayer frame_layer) {
 		output.parallax_settings = new ParallaxSettings();
 		output.name = layer.getName();
 		output.is_sublayer = true;
 
+		final PSDLayer settingsLayer = layer.findChildByName(TAGS.PARALLAX_SETTINGS);
+		final Float2 layerOffset = Geometry.newFloat2();
+		{
+			if (settingsLayer == null) {
+				L.d(layer);
+				layer.printChildren();
+				Err.reportError("missing tag " + TAGS.PARALLAX_SETTINGS);
+			}
+			readParallaxSettings(output.parallax_settings, settingsLayer, frame_layer, layerOffset, settings);
+			settings.addOffset(layerOffset);
+		}
+
 		for (int i = 0; i < layer.numberOfChildren(); i++) {
 			final PSDLayer child = layer.getChild(i);
 			final String childName = child.getName();
-			if (childName.startsWith("@parallax_settings")) {
-				readParallaxSettings(output.parallax_settings, child);
-// L.d("skip", childName);
+			if (childName.startsWith(TAGS.PARALLAX_SETTINGS)) {
+
 			} else {
 				final LayerElement childElement = settings.newLayerElement();
 				final SceneStructure structure = settings.getStructure();
+
 				convert(stack, child, childElement, settings);
 				output.children.addElement(childElement, structure);
 			}
 		}
+		final Float2 checkLayerOffset = settings.removeOffset();
+		Debug.checkTrue(checkLayerOffset == layerOffset);
 	}
 
-	private static void readParallaxSettings (final ParallaxSettings parallax_settings, final PSDLayer layer) {
-		final PSDLayer mx = layer.findChildByNamePrefix(TAGS.PARALLAX_MULTIPLIER_X);
-		final PSDLayer my = layer.findChildByNamePrefix(TAGS.PARALLAX_MULTIPLIER_Y);
-		final PSDLayer mz = layer.findChildByNamePrefix(TAGS.PARALLAX_MULTIPLIER_Z);
+	private static void readParallaxSettings (final ParallaxSettings parallax_settings, final PSDLayer layer,
+		final PSDLayer frame_layer, final Float2 layerOffset, final ConvertionSettings settings) {
 
-		parallax_settings.multiplier_x = 1.0f;
-		parallax_settings.multiplier_y = 0.0f;
+		readParallaxSettingX(parallax_settings, layer, frame_layer, layerOffset, settings);
+		readParallaxSettingY(parallax_settings, layer, frame_layer, layerOffset, settings);
+		readParallaxSettingZ(parallax_settings, layer, frame_layer, layerOffset, settings);
+
+	}
+
+	private static void readParallaxSettingZ (final ParallaxSettings parallax_settings, final PSDLayer layer,
+		final PSDLayer frame_layer, final Float2 layerOffset, final ConvertionSettings settings) {
 		parallax_settings.multiplier_z = 1.0f;
+	}
 
+	private static void readParallaxSettingY (final ParallaxSettings parallax_settings, final PSDLayer layer,
+		final PSDLayer frame_layer, final Float2 layerOffset, final ConvertionSettings settings) {
+		parallax_settings.multiplier_y = 0.0f;
+	}
+
+	private static void readParallaxSettingX (final ParallaxSettings parallax_settings, final PSDLayer layer,
+		final PSDLayer frame_layer, final Float2 layerOffset, final ConvertionSettings settings) {
+
+		final PSDLayer mx = layer.findChildByNamePrefix(TAGS.PARALLAX_MULTIPLIER_X);
+		parallax_settings.multiplier_x = 1.0f;
 		if (mx != null) {
 			parallax_settings.multiplier_x = Float.parseFloat(readParameter(mx, TAGS.PARALLAX_MULTIPLIER_X));
-		}
-		if (my != null) {
-			parallax_settings.multiplier_y = Float.parseFloat(readParameter(my, TAGS.PARALLAX_MULTIPLIER_Y));
-		}
-		if (mz != null) {
-			parallax_settings.multiplier_z = Float.parseFloat(readParameter(mz, TAGS.PARALLAX_MULTIPLIER_Z));
+			return;
 		}
 
+		if (frame_layer == null) {
+			return;
+		}
+
+		final PSDRaster frame = frame_layer.getRaster();
+		final PSDRasterPosition position = frame.getPosition();
+		final PSDRasterDimentions dim = frame.getDimentions();
+
+		final PSDLayer right = layer.findChildByNamePrefix(TAGS.ANCHOR_RIGHT);
+		final PSDLayer left = layer.findChildByNamePrefix(TAGS.ANCHOR_LEFT);
+		if (right == null && left == null) {
+			return;
+		}
+
+		final Float2 rightPos = readRightAnchor(right);
+		final Float2 leftPos = readLeftAnchor(left);
+		final double layerWidth = rightPos.getX() - leftPos.getX();
+
+		final double scaleFactor = settings.getScaleFactor();
+
+		layerOffset.setX((leftPos.getX() - position.getX()) * scaleFactor);
+
+		parallax_settings.multiplier_x = (float)((layerWidth - dim.getWidth()) / dim.getWidth());
+
+	}
+
+	private static Float2 readRightAnchor (final PSDLayer right) {
+		final Float2 result = Geometry.newFloat2();
+		final PSDRaster raster = right.getRaster();
+		Debug.checkNull(raster);
+		result.setX(raster.getPosition().getX());
+		result.setY(raster.getPosition().getY());
+		return result;
+	}
+
+	private static Float2 readLeftAnchor (final PSDLayer right) {
+		final Float2 result = Geometry.newFloat2();
+		final PSDRaster raster = right.getRaster();
+		Debug.checkNull(raster);
+		result.setX(raster.getPosition().getX() + raster.getDimentions().getWidth());
+		result.setY(raster.getPosition().getY() + raster.getDimentions().getHeight());
+		return result;
 	}
 
 	private static void convertProgress (final LayersStack stack, final PSDLayer input_parent, final LayerElement output,
@@ -1035,11 +1118,13 @@ public class PSDtoScene2DConverter {
 		// if (input.getName().startsWith("area_touch1")) {
 		// L.d();
 		// }
+		final Float2 offset = settings.getCurrentOffset();
+
 		final double scale_factor = settings.getScaleFactor();
 		output.is_raster = true;
 		output.blend_mode = RASTER_BLEND_MODE.valueOf(input.getMode().toString());
-		output.position_x = position.getX() * scale_factor;
-		output.position_y = position.getY() * scale_factor;
+		output.position_x = position.getX() * scale_factor + offset.getX();
+		output.position_y = position.getY() * scale_factor + offset.getY();
 		output.width = position.getWidth() * scale_factor;
 		output.opacity = input.getOpacity();
 		output.height = position.getHeight() * scale_factor;

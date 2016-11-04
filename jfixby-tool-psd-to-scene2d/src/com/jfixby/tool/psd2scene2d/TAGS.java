@@ -21,9 +21,14 @@ public class TAGS {
 	public static final String ID = "@id=";
 	public static final String SIZE = "@size=";
 
+	public static final String PARALLAX_SETTINGS = "@parallax_settings";
+
 	public static final String PARALLAX_MULTIPLIER_X = "@mX=";
 	public static final String PARALLAX_MULTIPLIER_Y = "@mY=";
 	public static final String PARALLAX_MULTIPLIER_Z = "@mZ=";
+
+	public static final String ANCHOR_RIGHT = "@anchorRight";
+	public static final String ANCHOR_LEFT = "@anchorLeft";
 
 	public static final String NAME = "@name=";
 	public static final String MARGIN = "@margin=";
