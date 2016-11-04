@@ -94,9 +94,10 @@ public class PSDtoScene2DConverter {
 				element.name = structure.structure_name;
 
 				setupCamera(stack, camera_layer, element, scale_factor);
-
-				structure.original_width = element.camera_settings.width;
-				structure.original_height = element.camera_settings.height;
+				if (element.camera_settings != null) {
+					structure.original_width = element.camera_settings.width;
+					structure.original_height = element.camera_settings.height;
+				}
 
 				L.d("structure found", structure.structure_name);
 
@@ -463,6 +464,10 @@ public class PSDtoScene2DConverter {
 		output.position_x = origin.getX();
 		output.position_y = origin.getY();
 
+		final Float2 parallaxOffset = Geometry.newFloat2();
+		parallaxOffset.subtract(origin);
+		settings.addOffset(parallaxOffset);
+
 		if (frame_layer != null) {
 			final PSDRaster frame = frame_layer.getRaster();
 			final PSDRasterPosition position = frame.getPosition();
@@ -488,7 +493,7 @@ public class PSDtoScene2DConverter {
 			convertParallaxLayer(stack, child, layer, settings, frame_layer);
 			output.children.addElement(layer, structure);
 		}
-
+		settings.removeOffset();
 	}
 
 	private static void convertParallaxLayer (final LayersStack stack, final PSDLayer layer, final LayerElement output,
@@ -575,7 +580,8 @@ public class PSDtoScene2DConverter {
 
 		final double scaleFactor = settings.getScaleFactor();
 
-		layerOffset.setX((leftPos.getX() - position.getX()) * scaleFactor);
+		final double offfsetX = -(leftPos.getX() - position.getX());
+		layerOffset.setX(offfsetX * scaleFactor);
 
 		parallax_settings.multiplier_x = (float)((layerWidth - dim.getWidth()) / dim.getWidth());
 
