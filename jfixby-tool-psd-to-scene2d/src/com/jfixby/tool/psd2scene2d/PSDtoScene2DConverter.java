@@ -64,11 +64,19 @@ public class PSDtoScene2DConverter {
 				final PSDLayer camera_layer = candidate.findChildByNamePrefix(TAGS.CAMERA);
 
 				float scale_factor = 1f;
+				float imageQuality = 1f;
 				{
 					final PSDLayer divisor = candidate.findChildByNamePrefix(TAGS.SCALE_DIVISOR);
 					if (divisor != null) {
 						final String divisor_string = readParameter(divisor, TAGS.SCALE_DIVISOR);
 						scale_factor = 1f / Float.parseFloat(divisor_string);
+					}
+				}
+				{
+					final PSDLayer quality = candidate.findChildByNamePrefix(TAGS.IMAGE_QUALITY);
+					if (quality != null) {
+						final String quality_string = readParameter(quality, TAGS.IMAGE_QUALITY);
+						imageQuality = Float.parseFloat(quality_string);
 					}
 				}
 				final SceneStructure structure = new SceneStructure();
@@ -80,6 +88,7 @@ public class PSDtoScene2DConverter {
 
 				settings.setResult(result_i);
 				result_i.setScaleFactor(scale_factor);
+				result_i.setImageQuality(imageQuality);
 
 				container.structures.addElement(structure);
 				structure.structure_name = readParameter(name_layer.getName(), TAGS.STRUCTURE_NAME);

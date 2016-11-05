@@ -68,7 +68,7 @@ public class PSDRepacker {
 		final File repacking_output = settings.getOutputFolder();
 		final int max_texture_size = settings.getMaxTextureSize();
 		final int margin = settings.getMargin();
-		final float imageQuality = FloatMath.limit(0, settings.getImageQuality(), 1);
+// final float imageQuality = FloatMath.limit(0, settings.getImageQuality(), 1);
 // int padding = margin;
 		final int max_page_size = settings.getAtlasMaxPageSize();
 		final List<File> related_folders = Collections.newList();
@@ -132,8 +132,9 @@ public class PSDRepacker {
 			L.d("---[Decomposing Raster]--------------------------------------------");
 			final File tiling_folder = temp_folder.child("tiling");
 			tiling_folder.makeFolder();
+
 			final Collection<TextureSlicingResult> structures = decomposeRaster(layer_to_file_mapping, tiling_folder,
-				max_texture_size, margin, forceRasterDecomposition, imageQuality);
+				max_texture_size, margin, forceRasterDecomposition, pack_result);
 			raster_folder.delete();
 
 			final SlicesCompositionsContainer container = new SlicesCompositionsContainer();
@@ -341,7 +342,7 @@ public class PSDRepacker {
 
 	static private List<TextureSlicingResult> decomposeRaster (final Map<PSDLayer, File> layer_to_file_mapping,
 		final File tiling_folder, final int max_texture_size, final int margin, final boolean forceRasterDecomposition,
-		final float imageQuality) throws IOException {
+		final ConversionResult imageQuality) throws IOException {
 		final List<TextureSlicingResult> results = Collections.newList();
 		for (int i = 0; i < layer_to_file_mapping.size(); i++) {
 			final PSDLayer layer_info = layer_to_file_mapping.getKeyAt(i);
@@ -351,14 +352,18 @@ public class PSDRepacker {
 			final double height = dim.getHeight();
 			final double diag = FloatMath.max(width, height);
 			final File png_file = layer_to_file_mapping.get(layer_info);
+
+			final SceneStructurePackingResult structure = imageQuality.getStrucutreResultByLayer(layer_info);
+			final float fimageQuality = structure.getImageQuality();
+
 			if (forceRasterDecomposition || diag > max_texture_size) {
 				// decompose
-				final TextureSlicingResult result = decomposeSprite(png_file, tiling_folder, margin, max_texture_size, imageQuality);
+				final TextureSlicingResult result = decomposeSprite(png_file, tiling_folder, margin, max_texture_size, fimageQuality);
 				results.add(result);
 			} else {
 				// copy as is
 				final File file_to_copy = png_file;
-				copyFile(file_to_copy, tiling_folder, imageQuality);
+				copyFile(file_to_copy, tiling_folder, fimageQuality);
 			}
 		}
 		return results;

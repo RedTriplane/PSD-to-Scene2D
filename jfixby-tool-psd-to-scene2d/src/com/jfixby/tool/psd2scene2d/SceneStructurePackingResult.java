@@ -16,6 +16,7 @@ public class SceneStructurePackingResult {
 	private float scale_factor;
 	private final SceneStructure structure;
 	private final Set<PSDLayer> ancestors = Collections.newSet();
+	private float imageQuality;
 
 	public SceneStructurePackingResult (final SceneStructure structure) {
 		this.structure = structure;
@@ -35,6 +36,10 @@ public class SceneStructurePackingResult {
 		this.scale_factor = scale_factor;
 	}
 
+	public float getImageQuality () {
+		return this.imageQuality;
+	}
+
 	public float getScaleFactor () {
 		return this.scale_factor;
 	}
@@ -45,6 +50,10 @@ public class SceneStructurePackingResult {
 
 	public SceneStructure getStructure () {
 		return this.structure;
+	}
+
+	public void setImageQuality (final float imageQuality) {
+		this.imageQuality = imageQuality;
 	}
 
 }

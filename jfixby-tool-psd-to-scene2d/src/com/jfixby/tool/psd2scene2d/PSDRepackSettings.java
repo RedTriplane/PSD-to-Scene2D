@@ -16,7 +16,7 @@ public class PSDRepackSettings {
 	private int gemserkPadding = -1;
 	private int texturePadding;
 	private boolean forceRasterDecomposition;
-	private float imageQuality = 1;
+// private float imageQuality = 1;
 	private int altas_min_page_size;
 	private boolean useIndexCompression;
 	private boolean useInMemoryFileSystem;
@@ -100,14 +100,6 @@ public class PSDRepackSettings {
 
 	public boolean forceRasterDecomposition () {
 		return this.forceRasterDecomposition;
-	}
-
-	public float getImageQuality () {
-		return this.imageQuality;
-	}
-
-	public void setImageQuality (final float imageQuality) {
-		this.imageQuality = imageQuality;
 	}
 
 	public void setAtlasMinPageSize (final int altas_min_page_size) {
