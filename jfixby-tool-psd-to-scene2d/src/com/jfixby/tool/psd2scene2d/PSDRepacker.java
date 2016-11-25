@@ -4,7 +4,7 @@ package com.jfixby.tool.psd2scene2d;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import com.jfixby.cmns.api.assets.AssetID;
+import com.jfixby.cmns.api.assets.ID;
 import com.jfixby.cmns.api.assets.Names;
 import com.jfixby.cmns.api.collections.Collection;
 import com.jfixby.cmns.api.collections.Collections;
@@ -64,7 +64,7 @@ public class PSDRepacker {
 		throws IOException {
 		final PSDRepackerResult result = new PSDRepackerResult();
 		final File psd_file = settings.getPSDFile();
-		final AssetID package_name = settings.getPackageName();
+		final ID package_name = settings.getPackageName();
 		final File repacking_output = settings.getOutputFolder();
 		final int max_texture_size = settings.getMaxTextureSize();
 		final int margin = settings.getMargin();
@@ -112,14 +112,14 @@ public class PSDRepacker {
 		scene2d_output.makeFolder();
 		scene2d_output.clearFolder();
 
-		final Map<PSDLayer, AssetID> raster_names = Collections.newMap();
+		final Map<PSDLayer, ID> raster_names = Collections.newMap();
 
 		final PSDFileContent layers_structure = extractLayerStructures(psd_file, raster_names, package_name);
 
 		L.d("---[Packing Layers Structure]--------------------------------------------");
 		final ConversionResult pack_result = packLayers(layers_structure, package_name, scene2d_output, raster_names);
 
-		final Collection<AssetID> used_raster = pack_result.listAllRequredAssets();
+		final Collection<ID> used_raster = pack_result.listAllRequredAssets();
 
 		L.d("---[Saving Raster]--------------------------------------------");
 		boolean raster_produced = false;
@@ -138,8 +138,8 @@ public class PSDRepacker {
 			raster_folder.delete();
 
 			final SlicesCompositionsContainer container = new SlicesCompositionsContainer();
-			final List<AssetID> packed_structures = Collections.newList();
-			final Set<AssetID> requred_rasters = Collections.newSet();
+			final List<ID> packed_structures = Collections.newList();
+			final Set<ID> requred_rasters = Collections.newSet();
 
 			for (final TextureSlicingResult combo : structures) {
 				final SlicesCompositionInfo composition = combo.getTilesComposition();
@@ -149,7 +149,7 @@ public class PSDRepacker {
 			}
 
 			if (container.content.size() > 0) {
-				final AssetID sctruct_package_name = package_name.child("psd").child(TextureSlicerSpecs.TILE_MAP_FILE_EXTENSION);
+				final ID sctruct_package_name = package_name.child("psd").child(TextureSlicerSpecs.TILE_MAP_FILE_EXTENSION);
 
 				final String struct_pkg_name = sctruct_package_name.toString();
 				File container_file = repacking_output.child(struct_pkg_name);
@@ -230,7 +230,7 @@ public class PSDRepacker {
 			// Collection<AssetID> packed_rasters = atlas_result
 			// .listPackedAssets();
 
-			final Set<AssetID> packed_rasters = Collections.newSet();
+			final Set<ID> packed_rasters = Collections.newSet();
 			packed_rasters.addAll(requred_rasters);
 			packed_rasters.addAll(atlas_result.listPackedAssets());
 
@@ -262,8 +262,8 @@ public class PSDRepacker {
 
 	}
 
-	static private PSDFileContent extractLayerStructures (final File psd_file, final Map<PSDLayer, AssetID> raster_names,
-		final AssetID package_name) throws IOException {
+	static private PSDFileContent extractLayerStructures (final File psd_file, final Map<PSDLayer, ID> raster_names,
+		final ID package_name) throws IOException {
 		int k = 0;
 
 		final PSDUnpackingParameters specs = PSDUnpacker.newUnpackingSpecs();
@@ -275,17 +275,17 @@ public class PSDRepacker {
 
 		for (int i = 0; i < rasters.size(); i++) {
 			final PSDLayer element = rasters.getElementAt(i);
-			final AssetID raster_name = Names.newAssetID(package_name + ".psd.raster_" + k);
+			final ID raster_name = Names.newAssetID(package_name + ".psd.raster_" + k);
 			raster_names.put(element, raster_name);
 			k++;
 		}
 		return result;
 	}
 
-	static private ConversionResult packLayers (final PSDFileContent layers_structure, final AssetID package_name,
-		final File final_output, final Map<PSDLayer, AssetID> raster_names) throws IOException {
+	static private ConversionResult packLayers (final PSDFileContent layers_structure, final ID package_name,
+		final File final_output, final Map<PSDLayer, ID> raster_names) throws IOException {
 
-		final AssetID package_prefix = package_name;
+		final ID package_prefix = package_name;
 
 		final Scene2DPackage container = new Scene2DPackage();
 		final PSDRootLayer root = layers_structure.getRootlayer();
@@ -305,14 +305,14 @@ public class PSDRepacker {
 
 		final File descriptor = file.parent().parent();
 
-		final List<AssetID> provisions = Collections.newList();
+		final List<ID> provisions = Collections.newList();
 
 		for (int i = 0; i < container.structures.size(); i++) {
-			final AssetID element_id = Names.newAssetID(container.structures.get(i).structure_name);
+			final ID element_id = Names.newAssetID(container.structures.get(i).structure_name);
 			provisions.add(element_id);
 		}
 
-		final Collection<AssetID> requred_assets = result.listAllRequredAssets();
+		final Collection<ID> requred_assets = result.listAllRequredAssets();
 		PackageUtils.producePackageDescriptor(descriptor, Scene2DPackage.SCENE2D_PACKAGE_FORMAT, "1.0", provisions, requred_assets,
 			root_file_name);
 
@@ -406,14 +406,14 @@ public class PSDRepacker {
 		return result;
 	}
 
-	static private boolean saveRaster (final File package_root_file, final Map<PSDLayer, AssetID> raster_names,
-		final Collection<AssetID> used_raster, final File output_folder, final AssetID package_name, final boolean save_raster,
+	static private boolean saveRaster (final File package_root_file, final Map<PSDLayer, ID> raster_names,
+		final Collection<ID> used_raster, final File output_folder, final ID package_name, final boolean save_raster,
 		final Map<PSDLayer, File> layer_to_file_mapping, final ConversionResult pack_result) throws IOException {
 		boolean raster_produced = false;
 		for (int i = 0; i < raster_names.size(); i++) {
 
 			final PSDLayer layer = raster_names.getKeyAt(i);
-			final AssetID raster_name = raster_names.getValueAt(i);
+			final ID raster_name = raster_names.getValueAt(i);
 			if (!used_raster.contains(raster_name)) {
 				continue;
 			}

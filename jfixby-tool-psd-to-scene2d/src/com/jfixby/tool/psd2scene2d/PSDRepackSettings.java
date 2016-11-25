@@ -1,13 +1,13 @@
 
 package com.jfixby.tool.psd2scene2d;
 
-import com.jfixby.cmns.api.assets.AssetID;
+import com.jfixby.cmns.api.assets.ID;
 import com.jfixby.cmns.api.file.File;
 
 public class PSDRepackSettings {
 
 	private File psd_file;
-	private AssetID package_name;
+	private ID package_name;
 	private File output_folder;
 	private int max_texture_size;
 	private int margin;
@@ -26,7 +26,7 @@ public class PSDRepackSettings {
 		this.psd_file = psd_file;
 	}
 
-	public void setPackageName (final AssetID package_name) {
+	public void setPackageName (final ID package_name) {
 		this.package_name = package_name;
 	}
 
@@ -46,7 +46,7 @@ public class PSDRepackSettings {
 		this.ignore_atlas = ignore_atlas;
 	}
 
-	public AssetID getPackageName () {
+	public ID getPackageName () {
 		return this.package_name;
 	}
 

@@ -3,7 +3,7 @@ package com.jfixby.tool.psd2scene2d;
 
 import java.util.Vector;
 
-import com.jfixby.cmns.api.assets.AssetID;
+import com.jfixby.cmns.api.assets.ID;
 import com.jfixby.cmns.api.assets.Names;
 import com.jfixby.cmns.api.collections.Collections;
 import com.jfixby.cmns.api.collections.List;
@@ -40,8 +40,8 @@ import com.jfixby.r3.ext.api.scene2d.srlz.TextSettings;
 
 public class PSDtoScene2DConverter {
 
-	public static ConversionResult convert (final Scene2DPackage container, final AssetID package_prefix, final PSDLayer root,
-		final Map<PSDLayer, AssetID> raster_names) {
+	public static ConversionResult convert (final Scene2DPackage container, final ID package_prefix, final PSDLayer root,
+		final Map<PSDLayer, ID> raster_names) {
 		final ConversionResult results = new ConversionResult();
 
 		// naming.print("naming");
@@ -329,7 +329,7 @@ public class PSDtoScene2DConverter {
 			} else {
 				final String child_id = readParameter(id, TAGS.ID);
 
-				final AssetID child_scene_asset_id = Names.newAssetID(child_id);
+				final ID child_scene_asset_id = Names.newAssetID(child_id);
 
 				output.child_scene_settings.child_scene_id = child_scene_asset_id.toString();
 
@@ -392,7 +392,7 @@ public class PSDtoScene2DConverter {
 			} else {
 				final String bar_id_string = readParameter(id, TAGS.ID);
 				final PsdRepackerNameResolver naming = settings.getNaming();
-				final AssetID bar_id = naming.childText(bar_id_string);
+				final ID bar_id = naming.childText(bar_id_string);
 				output.textbar_id = bar_id.toString();
 			}
 		}
@@ -406,7 +406,7 @@ public class PSDtoScene2DConverter {
 				} else {
 					final String text_value_asset_id_string = readParameter(id, TAGS.ID);
 					final PsdRepackerNameResolver naming = settings.getNaming();
-					final AssetID text_value_asset_id = Names.newAssetID(text_value_asset_id_string);
+					final ID text_value_asset_id = Names.newAssetID(text_value_asset_id_string);
 // final AssetID text_value_asset_id = naming.childText(text_value_asset_id_string);
 
 					output.text_settings.text_value_asset_id = text_value_asset_id.toString();

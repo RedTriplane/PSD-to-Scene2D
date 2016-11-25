@@ -1,7 +1,7 @@
 
 package com.jfixby.tool.psd2scene2d;
 
-import com.jfixby.cmns.api.assets.AssetID;
+import com.jfixby.cmns.api.assets.ID;
 import com.jfixby.cmns.api.collections.Collection;
 import com.jfixby.cmns.api.collections.Collections;
 import com.jfixby.cmns.api.collections.List;
@@ -12,7 +12,7 @@ import com.jfixby.r3.ext.api.scene2d.srlz.SceneStructure;
 
 public class SceneStructurePackingResult {
 
-	List<AssetID> lit = Collections.newList();
+	List<ID> lit = Collections.newList();
 	private float scale_factor;
 	private final SceneStructure structure;
 	private final Set<PSDLayer> ancestors = Collections.newSet();
@@ -22,13 +22,13 @@ public class SceneStructurePackingResult {
 		this.structure = structure;
 	}
 
-	public void addRequiredAsset (final AssetID child_scene_asset_id, final List<PSDLayer> list) {
+	public void addRequiredAsset (final ID child_scene_asset_id, final List<PSDLayer> list) {
 		Debug.checkNull(child_scene_asset_id);
 		this.lit.add(child_scene_asset_id);
 		this.ancestors.addAll(list);
 	}
 
-	public List<AssetID> listRequiredAssets () {
+	public List<ID> listRequiredAssets () {
 		return this.lit;
 	}
 

@@ -1,7 +1,7 @@
 
 package com.jfixby.tool.psd2scene2d;
 
-import com.jfixby.cmns.api.assets.AssetID;
+import com.jfixby.cmns.api.assets.ID;
 import com.jfixby.cmns.api.collections.Collection;
 import com.jfixby.cmns.api.collections.Collections;
 import com.jfixby.cmns.api.collections.List;
@@ -16,12 +16,12 @@ public class ConversionResult {
 
 	Map<PSDLayer, SceneStructurePackingResult> ancestors = Collections.newMap();
 
-	public Collection<AssetID> listAllRequredAssets () {
-		final List<AssetID> list = Collections.newList();
+	public Collection<ID> listAllRequredAssets () {
+		final List<ID> list = Collections.newList();
 
 		for (int i = 0; i < this.requred_raster.size(); i++) {
 			final SceneStructurePackingResult result_i = this.requred_raster.getValueAt(i);
-			final List<AssetID> required = result_i.listRequiredAssets();
+			final List<ID> required = result_i.listRequiredAssets();
 			list.addAll(required);
 		}
 		return list;
