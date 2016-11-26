@@ -144,7 +144,7 @@ public class PSDRepacker {
 			for (final TextureSlicingResult combo : structures) {
 				final SlicesCompositionInfo composition = combo.getTilesComposition();
 				container.content.addElement(composition);
-				packed_structures.add(Names.newAssetID(composition.composition_asset_id_string));
+				packed_structures.add(Names.newID(composition.composition_asset_id_string));
 				requred_rasters.addAll(combo.listProducedTiles());
 			}
 
@@ -275,7 +275,7 @@ public class PSDRepacker {
 
 		for (int i = 0; i < rasters.size(); i++) {
 			final PSDLayer element = rasters.getElementAt(i);
-			final ID raster_name = Names.newAssetID(package_name + ".psd.raster_" + k);
+			final ID raster_name = Names.newID(package_name + ".psd.raster_" + k);
 			raster_names.put(element, raster_name);
 			k++;
 		}
@@ -308,7 +308,7 @@ public class PSDRepacker {
 		final List<ID> provisions = Collections.newList();
 
 		for (int i = 0; i < container.structures.size(); i++) {
-			final ID element_id = Names.newAssetID(container.structures.get(i).structure_name);
+			final ID element_id = Names.newID(container.structures.get(i).structure_name);
 			provisions.add(element_id);
 		}
 
@@ -399,7 +399,7 @@ public class PSDRepacker {
 
 		final String asset_name = png_file_path.getName().substring(0, png_file_path.getName().length() - ".png".length());
 
-		specs.setNameSpacePrefix(Names.newAssetID(asset_name));
+		specs.setNameSpacePrefix(Names.newID(asset_name));
 		specs.setOutputFolder(tiling_folder);
 		specs.setImageQuality(imageQuality);
 		final TextureSlicingResult result = TextureSlicer.decompose(specs);

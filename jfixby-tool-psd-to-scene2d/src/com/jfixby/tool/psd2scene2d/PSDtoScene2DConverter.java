@@ -95,7 +95,7 @@ public class PSDtoScene2DConverter {
 				structure.structure_name = package_prefix.child(structure.structure_name).toString();
 				final LayerElement element = structure.root;
 
-				final PsdRepackerNameResolver naming = new PsdRepackerNameResolver(Names.newAssetID(structure.structure_name),
+				final PsdRepackerNameResolver naming = new PsdRepackerNameResolver(Names.newID(structure.structure_name),
 					raster_names);
 				settings.setNaming(naming);
 				convert(stack, content_layer, element, settings);
@@ -239,7 +239,7 @@ public class PSDtoScene2DConverter {
 				output.shader_id = id_string;
 				output.name = input.getName();
 				final SceneStructurePackingResult result = settings.getResult();
-				result.addRequiredAsset(Names.newAssetID(id_string), Collections.newList(shader_node));
+				result.addRequiredAsset(Names.newID(id_string), Collections.newList(shader_node));
 			}
 		}
 
@@ -329,7 +329,7 @@ public class PSDtoScene2DConverter {
 			} else {
 				final String child_id = readParameter(id, TAGS.ID);
 
-				final ID child_scene_asset_id = Names.newAssetID(child_id);
+				final ID child_scene_asset_id = Names.newID(child_id);
 
 				output.child_scene_settings.child_scene_id = child_scene_asset_id.toString();
 
@@ -406,7 +406,7 @@ public class PSDtoScene2DConverter {
 				} else {
 					final String text_value_asset_id_string = readParameter(id, TAGS.ID);
 					final PsdRepackerNameResolver naming = settings.getNaming();
-					final ID text_value_asset_id = Names.newAssetID(text_value_asset_id_string);
+					final ID text_value_asset_id = Names.newID(text_value_asset_id_string);
 // final AssetID text_value_asset_id = naming.childText(text_value_asset_id_string);
 
 					output.text_settings.text_value_asset_id = text_value_asset_id.toString();
@@ -439,7 +439,7 @@ public class PSDtoScene2DConverter {
 				final String font_name_string = readParameter(font_name.getName(), TAGS.NAME);
 				output.text_settings.font_settings.name = font_name_string;
 				final SceneStructurePackingResult result = settings.getResult();
-				result.addRequiredAsset(Names.newAssetID(font_name_string), Collections.newList(input));
+				result.addRequiredAsset(Names.newID(font_name_string), Collections.newList(input));
 			}
 			final PSDLayer padding = input.findChildByNamePrefix(TAGS.PADDING);
 			if (padding != null) {
@@ -1147,7 +1147,7 @@ public class PSDtoScene2DConverter {
 		final SceneStructurePackingResult result = settings.getResult();
 		final String raster_name = naming.getPSDLayerName(input).toString();
 		output.raster_id = raster_name;
-		result.addRequiredAsset(Names.newAssetID(output.raster_id), Collections.newList(input));
+		result.addRequiredAsset(Names.newID(output.raster_id), Collections.newList(input));
 	}
 
 }
