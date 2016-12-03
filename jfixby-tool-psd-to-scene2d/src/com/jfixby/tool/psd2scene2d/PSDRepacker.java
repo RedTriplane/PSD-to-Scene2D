@@ -473,7 +473,7 @@ public class PSDRepacker {
 	public static int regressiveInt (final int target_value, final int threshold) {
 		final double power_of_2 = FloatMath.log(2, target_value);
 		if (!FloatMath.isInteger(power_of_2)) {
-			throw new Error("Is not power of two: 2^" + power_of_2 + "=" + target_value);
+			Err.reportError("Is not power of two: 2^" + power_of_2 + "=" + target_value);
 		}
 		int result = 1;
 		int add = target_value;

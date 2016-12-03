@@ -128,7 +128,7 @@ public class PSDtoScene2DConverter {
 		final PSDLayer mode = camera_layer.findChildByNamePrefix(TAGS.MODE);
 		if (area == null) {
 // stack.print();
-// throw new Error("Tag <" + TAGS.AREA + "> not found.");
+// Err.reportError("Tag <" + TAGS.AREA + "> not found.");
 			cameraSettings.mode = MODE.FILL_SCREEN;
 		}
 
@@ -169,42 +169,42 @@ public class PSDtoScene2DConverter {
 			// PSDLayer events_node = input.findChild(EVENT);
 			if (animation_node != null) {
 				if (input.numberOfChildren() != 1) {
-					throw new Error("Annotation problem (only one child allowed). This is not an animation node: " + input);
+					Err.reportError("Annotation problem (only one child allowed). This is not an animation node: " + input);
 				}
 				convertAnimation(stack, input, output, settings);
 			} else if (childscene_node != null) {
 				if (input.numberOfChildren() != 1) {
-					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
+					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
 				convertChildScene(stack, input, output, settings);
 			} else if (shader_node != null) {
 				if (input.numberOfChildren() != 1) {
-					throw new Error("Annotation problem (only one child allowed). This is not an	 child scene node: " + input);
+					Err.reportError("Annotation problem (only one child allowed). This is not an	 child scene node: " + input);
 				}
 				convertShader(input, output, settings);
 			} else if (text_node != null) {
 				if (input.numberOfChildren() != 1) {
-					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
+					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
 				convertText(stack, input, output, settings);
 			} else if (user_input != null) {
 				if (input.numberOfChildren() != 1) {
-					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
+					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
 				convertInput(stack, input, output, settings);
 			} else if (progress != null) {
 				if (input.numberOfChildren() != 1) {
-					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
+					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
 				convertProgress(stack, input, output, settings);
 			} else if (parallax != null) {
 				if (input.numberOfChildren() != 1) {
-					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
+					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
 				convertParallax(stack, input, output, settings);
 			} else if (false) {
 				if (input.numberOfChildren() != 1) {
-					throw new Error("Annotation problem (only one child allowed). This is not an child scene node: " + input);
+					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
 				// convertEventsSequence(input, output, naming, result,
 				// scale_factor);
@@ -233,7 +233,7 @@ public class PSDtoScene2DConverter {
 		{
 			final PSDLayer id_layer = findChild(TAGS.ID, shader_node);
 			if (id_layer == null) {
-				throw new Error("Missing tag <" + TAGS.ID + ">");
+				Err.reportError("Missing tag <" + TAGS.ID + ">");
 			} else {
 				final String id_string = readParameter(id_layer, TAGS.ID);
 				output.shader_id = id_string;
@@ -306,7 +306,7 @@ public class PSDtoScene2DConverter {
 		final PSDLayer frame = input.findChildByNamePrefix(TAGS.FRAME);
 		{
 			if (frame != null) {
-				throw new Error("Unsupported tag: " + TAGS.FRAME);
+				Err.reportError("Unsupported tag: " + TAGS.FRAME);
 			}
 		}
 
@@ -325,7 +325,7 @@ public class PSDtoScene2DConverter {
 			final PSDLayer id = findChild(TAGS.ID, input);
 
 			if (id == null) {
-				throw new Error("Missing tag <@" + TAGS.ID + ">");
+				Err.reportError("Missing tag <@" + TAGS.ID + ">");
 			} else {
 				final String child_id = readParameter(id, TAGS.ID);
 
@@ -356,7 +356,7 @@ public class PSDtoScene2DConverter {
 		final PSDLayer frame = input.findChildByNamePrefix(TAGS.FRAME);
 		{
 			if (frame != null) {
-				throw new Error("Unsupported tag: " + TAGS.FRAME);
+				Err.reportError("Unsupported tag: " + TAGS.FRAME);
 			}
 		}
 		{
@@ -388,7 +388,7 @@ public class PSDtoScene2DConverter {
 		{
 			final PSDLayer id = findChild(TAGS.ID, input);
 			if (id == null) {
-				throw new Error("Missing tag <" + TAGS.ID + ">");
+				Err.reportError("Missing tag <" + TAGS.ID + ">");
 			} else {
 				final String bar_id_string = readParameter(id, TAGS.ID);
 				final PsdRepackerNameResolver naming = settings.getNaming();
@@ -402,7 +402,7 @@ public class PSDtoScene2DConverter {
 			if (text_node != null) {
 				final PSDLayer id = findChild(TAGS.ID, text_node);
 				if (id == null) {
-					throw new Error("Missing tag <@" + TAGS.ID + ">");
+					Err.reportError("Missing tag <@" + TAGS.ID + ">");
 				} else {
 					final String text_value_asset_id_string = readParameter(id, TAGS.ID);
 					final PsdRepackerNameResolver naming = settings.getNaming();
@@ -423,7 +423,7 @@ public class PSDtoScene2DConverter {
 			if (font_node != null) {
 				final PSDLayer size = findChild(TAGS.SIZE, font_node);
 				if (size == null) {
-					throw new Error("Missing tag <@" + TAGS.SIZE + ">");
+					Err.reportError("Missing tag <@" + TAGS.SIZE + ">");
 				} else {
 					final String font_size_string = readParameter(size.getName(), TAGS.SIZE);
 					output.text_settings.font_settings.font_size = (Float.parseFloat(font_size_string));
@@ -631,7 +631,7 @@ public class PSDtoScene2DConverter {
 			if (type == null) {
 				stack.print();
 				input_parent.printChildren();
-				throw new Error("Missing tag <" + TAGS.TYPE + ">");
+				Err.reportError("Missing tag <" + TAGS.TYPE + ">");
 			} else {
 				final String typevalue = readParameter(type, TAGS.TYPE).toUpperCase();
 				output.progress_settings.type = ProgressSettings.TYPE.valueOf(typevalue);
@@ -643,7 +643,7 @@ public class PSDtoScene2DConverter {
 
 			if (raster == null) {
 				stack.print();
-				throw new Error("Missing tag <@" + TAGS.RASTER + ">");
+				Err.reportError("Missing tag <@" + TAGS.RASTER + ">");
 			} else {
 				final LayerElement rasterNode = settings.newLayerElement();
 				convert(stack, raster.getChild(0), rasterNode, settings);
@@ -677,7 +677,7 @@ public class PSDtoScene2DConverter {
 
 				if (element.name.startsWith("@")) {
 					stack.print();
-					throw new Error("Bad layer name: " + element.name);
+					Err.reportError("Bad layer name: " + element.name);
 				}
 			}
 		}
@@ -772,7 +772,7 @@ public class PSDtoScene2DConverter {
 				for (int i = 0; i < touch_area.numberOfChildren(); i++) {
 					final PSDLayer child = touch_area.getChild(i);
 					if (child.isFolder()) {
-						throw new Error("Touch area has no dimentions: " + child);
+						Err.reportError("Touch area has no dimentions: " + child);
 					} else {
 						final PSDRaster raster = child.getRaster();
 						Debug.checkNull("raster", raster);
@@ -961,7 +961,7 @@ public class PSDtoScene2DConverter {
 			final PSDLayer id = findChild(TAGS.ID, input);
 
 			if (id == null) {
-				throw new Error("Animation ID tag not found: " + input);
+				Err.reportError("Animation ID tag not found: " + input);
 			} else {
 				output.animation_id = readParameter(id.getName(), TAGS.ID);
 				final PsdRepackerNameResolver naming = settings.getNaming();
@@ -982,7 +982,7 @@ public class PSDtoScene2DConverter {
 			}
 
 			if (!(animation_settings.is_positions_modifyer_animation || animation_settings.is_simple_animation)) {
-				throw new Error("Unknown animation type: " + type);
+				Err.reportError("Unknown animation type: " + type);
 			}
 		}
 
@@ -1001,14 +1001,14 @@ public class PSDtoScene2DConverter {
 					convert(stack, child, element, settings);
 				}
 				if (frames.numberOfChildren() == 0) {
-					throw new Error("No frames found for " + output.animation_id);
+					Err.reportError("No frames found for " + output.animation_id);
 				}
 			}
 			{
 				final PSDLayer frame = findChild(TAGS.FRAME_TIME, input);
 				if (frame == null) {
 					// animation_settings.single_frame_time = Long.MAX_VALUE;
-					throw new Error("Missing frame time tag: @" + TAGS.FRAME_TIME);
+					Err.reportError("Missing frame time tag: @" + TAGS.FRAME_TIME);
 
 				} else {
 					final String type_value = readParameter(frame.getName(), TAGS.FRAME_TIME);
@@ -1127,7 +1127,7 @@ public class PSDtoScene2DConverter {
 		output.name = input.getName();
 
 		if (output.name.startsWith("@")) {
-			throw new Error("Bad layer name: " + output.name);
+			Err.reportError("Bad layer name: " + output.name);
 		}
 
 		// if (input.getName().startsWith("area_touch1")) {
