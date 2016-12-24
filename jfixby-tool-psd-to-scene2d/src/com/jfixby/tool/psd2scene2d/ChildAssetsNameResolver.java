@@ -1,8 +1,8 @@
 
 package com.jfixby.tool.psd2scene2d;
 
-import com.jfixby.cmns.api.assets.ID;
 import com.jfixby.psd.unpacker.api.PSDLayer;
+import com.jfixby.scarabei.api.assets.ID;
 
 public interface ChildAssetsNameResolver {
 

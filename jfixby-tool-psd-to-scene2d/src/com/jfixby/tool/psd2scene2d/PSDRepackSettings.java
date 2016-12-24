@@ -1,8 +1,8 @@
 
 package com.jfixby.tool.psd2scene2d;
 
-import com.jfixby.cmns.api.assets.ID;
-import com.jfixby.cmns.api.file.File;
+import com.jfixby.scarabei.api.assets.ID;
+import com.jfixby.scarabei.api.file.File;
 
 public class PSDRepackSettings {
 

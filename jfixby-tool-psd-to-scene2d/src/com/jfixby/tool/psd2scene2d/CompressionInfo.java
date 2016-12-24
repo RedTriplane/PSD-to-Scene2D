@@ -1,8 +1,8 @@
 
 package com.jfixby.tool.psd2scene2d;
 
-import com.jfixby.cmns.api.log.L;
-import com.jfixby.cmns.api.math.FloatMath;
+import com.jfixby.scarabei.api.log.L;
+import com.jfixby.scarabei.api.math.FloatMath;
 
 public class CompressionInfo {
 
