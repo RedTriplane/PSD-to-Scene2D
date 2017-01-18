@@ -7,7 +7,7 @@ import com.jfixby.psd.unpacker.api.PSDLayer;
 import com.jfixby.psd.unpacker.api.PSDRaster;
 import com.jfixby.psd.unpacker.api.PSDRasterDimentions;
 import com.jfixby.psd.unpacker.api.PSDRasterPosition;
-import com.jfixby.r3.api.shader.srlz.SHADER_PARAMETERS;
+import com.jfixby.r3.api.shader.srlz.SHADER_PARAMETER;
 import com.jfixby.r3.ext.api.scene2d.srlz.Action;
 import com.jfixby.r3.ext.api.scene2d.srlz.ActionsGroup;
 import com.jfixby.r3.ext.api.scene2d.srlz.Anchor;
@@ -249,9 +249,9 @@ public class PSDtoScene2DConverter {
 			if (origin != null) {
 				final double shader_x = origin.getRaster().getPosition().getX() * scale_factor;
 				final double shader_y = origin.getRaster().getPosition().getY() * scale_factor;
-				final ShaderParameterValue canvas_x = new ShaderParameterValue(SHADER_PARAMETERS.POSITION_X, "" + shader_x,
+				final ShaderParameterValue canvas_x = new ShaderParameterValue(SHADER_PARAMETER.POSITION_X, "" + shader_x,
 					ShaderParameterType.FLOAT);
-				final ShaderParameterValue canvas_y = new ShaderParameterValue(SHADER_PARAMETERS.POSITION_Y, "" + shader_y,
+				final ShaderParameterValue canvas_y = new ShaderParameterValue(SHADER_PARAMETER.POSITION_Y, "" + shader_y,
 					ShaderParameterType.FLOAT);
 
 				shader_settings.params.addElement(canvas_x);
@@ -263,7 +263,7 @@ public class PSDtoScene2DConverter {
 					final double ry = radius.getRaster().getPosition().getY() * scale_factor;
 					final double shader_radius = FloatMath.distance(shader_x, shader_y, rx, ry);
 
-					final ShaderParameterValue radius_p = new ShaderParameterValue(SHADER_PARAMETERS.RADIUS, "" + shader_radius,
+					final ShaderParameterValue radius_p = new ShaderParameterValue(SHADER_PARAMETER.RADIUS, "" + shader_radius,
 						ShaderParameterType.FLOAT);
 
 					shader_settings.params.addElement(radius_p);
