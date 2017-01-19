@@ -14,17 +14,6 @@ import com.jfixby.r3.ext.api.scene2d.srlz.Anchor;
 import com.jfixby.r3.ext.api.scene2d.srlz.AnimationSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.CameraSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.CameraSettings.MODE;
-import com.jfixby.scarabei.api.assets.ID;
-import com.jfixby.scarabei.api.assets.Names;
-import com.jfixby.scarabei.api.collections.Collections;
-import com.jfixby.scarabei.api.collections.List;
-import com.jfixby.scarabei.api.collections.Map;
-import com.jfixby.scarabei.api.debug.Debug;
-import com.jfixby.scarabei.api.err.Err;
-import com.jfixby.scarabei.api.floatn.Float2;
-import com.jfixby.scarabei.api.geometry.Geometry;
-import com.jfixby.scarabei.api.log.L;
-import com.jfixby.scarabei.api.math.FloatMath;
 import com.jfixby.r3.ext.api.scene2d.srlz.ChildSceneSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.InputSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.LayerElement;
@@ -37,6 +26,17 @@ import com.jfixby.r3.ext.api.scene2d.srlz.ShaderParameterType;
 import com.jfixby.r3.ext.api.scene2d.srlz.ShaderParameterValue;
 import com.jfixby.r3.ext.api.scene2d.srlz.ShaderSettings;
 import com.jfixby.r3.ext.api.scene2d.srlz.TextSettings;
+import com.jfixby.scarabei.api.assets.ID;
+import com.jfixby.scarabei.api.assets.Names;
+import com.jfixby.scarabei.api.collections.Collections;
+import com.jfixby.scarabei.api.collections.List;
+import com.jfixby.scarabei.api.collections.Map;
+import com.jfixby.scarabei.api.debug.Debug;
+import com.jfixby.scarabei.api.err.Err;
+import com.jfixby.scarabei.api.floatn.Float2;
+import com.jfixby.scarabei.api.geometry.Geometry;
+import com.jfixby.scarabei.api.log.L;
+import com.jfixby.scarabei.api.math.FloatMath;
 
 public class PSDtoScene2DConverter {
 
@@ -126,10 +126,19 @@ public class PSDtoScene2DConverter {
 
 		final PSDLayer area = camera_layer.findChildByNamePrefix(TAGS.AREA);
 		final PSDLayer mode = camera_layer.findChildByNamePrefix(TAGS.MODE);
+		final PSDLayer target = camera_layer.findChildByNamePrefix(TAGS.TARGET);
 		if (area == null) {
-// stack.print();
-// Err.reportError("Tag <" + TAGS.AREA + "> not found.");
 			cameraSettings.mode = MODE.FILL_SCREEN;
+			if (target != null) {
+				final PSDRaster raster = target.getRaster();
+				Debug.checkNull("raster", raster);
+				cameraSettings.position_x = raster.getPosition().getX() * scale_factor
+					+ raster.getDimentions().getWidth() * scale_factor / 2;
+				cameraSettings.position_y = raster.getPosition().getY() * scale_factor
+					+ raster.getDimentions().getHeight() * scale_factor / 2;
+				cameraSettings.origin_relative_x = 0.5;
+				cameraSettings.origin_relative_y = 0.5;
+			}
 		}
 
 		if (area != null) {
