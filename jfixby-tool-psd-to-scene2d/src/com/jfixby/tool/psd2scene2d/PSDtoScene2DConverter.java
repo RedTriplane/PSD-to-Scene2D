@@ -126,35 +126,33 @@ public class PSDtoScene2DConverter {
 
 		final PSDLayer area = camera_layer.findChildByNamePrefix(TAGS.AREA);
 		final PSDLayer mode = camera_layer.findChildByNamePrefix(TAGS.MODE);
-		final PSDLayer target = camera_layer.findChildByNamePrefix(TAGS.TARGET);
-		if (area == null) {
-			cameraSettings.mode = MODE.FILL_SCREEN;
-			if (target != null) {
-				final PSDRaster raster = target.getRaster();
-				Debug.checkNull("raster", raster);
-				cameraSettings.position_x = raster.getPosition().getX() * scale_factor
-					+ raster.getDimentions().getWidth() * scale_factor / 2;
-				cameraSettings.position_y = raster.getPosition().getY() * scale_factor
-					+ raster.getDimentions().getHeight() * scale_factor / 2;
-				cameraSettings.origin_relative_x = 0.5;
-				cameraSettings.origin_relative_y = 0.5;
-			}
-		}
+		final PSDLayer origin = camera_layer.findChildByNamePrefix(TAGS.ORIGIN);
 
-		if (area != null) {
-			final PSDRaster raster = area.getRaster();
-			Debug.checkNull("raster", raster);
+		Debug.checkNull("mode", mode);
+		final String modeString = readParameter(mode, TAGS.MODE);
+		cameraSettings.mode = MODE.valueOf(modeString.toUpperCase());
 
-			cameraSettings.position_x = raster.getPosition().getX() * scale_factor;
-			cameraSettings.position_y = raster.getPosition().getY() * scale_factor;
-			cameraSettings.width = raster.getDimentions().getWidth() * scale_factor;
-			cameraSettings.height = raster.getDimentions().getHeight() * scale_factor;
+		{
+			final PSDRaster originRaster = origin.getRaster();
+			Debug.checkNull("raster", originRaster);
 
-		}
+			final PSDRaster areaRaster = area.getRaster();
+			Debug.checkNull("raster", areaRaster);
 
-		if (mode != null) {
-			final String modeString = readParameter(mode, TAGS.MODE);
-			cameraSettings.mode = MODE.valueOf(modeString.toUpperCase());
+			cameraSettings.position_x = originRaster.getPosition().getX() * scale_factor
+				+ originRaster.getBufferedImage().getWidth() * scale_factor / 2d;
+			cameraSettings.position_y = originRaster.getPosition().getY() * scale_factor
+				+ originRaster.getBufferedImage().getHeight() * scale_factor / 2d;
+			;
+
+			cameraSettings.width = areaRaster.getDimentions().getWidth() * scale_factor;
+			cameraSettings.height = areaRaster.getDimentions().getHeight() * scale_factor;
+
+			cameraSettings.origin_relative_x = (cameraSettings.position_x - areaRaster.getPosition().getX() * scale_factor)
+				/ cameraSettings.width;
+			cameraSettings.origin_relative_y = (cameraSettings.position_y - areaRaster.getPosition().getY() * scale_factor)
+				/ cameraSettings.height;
+
 		}
 
 		element.camera_settings = cameraSettings;

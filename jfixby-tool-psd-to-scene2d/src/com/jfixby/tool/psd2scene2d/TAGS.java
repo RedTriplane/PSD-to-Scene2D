@@ -41,7 +41,6 @@ public class TAGS {
 
 	public static final String AREA = "@area";
 	public static final String MODE = "@mode=";
-	public static final String TARGET = "@target";
 	public static final String USE_APERTURE = "@use_aperture=";
 	public static final String BACKGROUND = "@background";
 	public static final String CONTENT = "@content";
