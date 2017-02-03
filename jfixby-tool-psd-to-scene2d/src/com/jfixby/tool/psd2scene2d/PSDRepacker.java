@@ -125,8 +125,10 @@ public class PSDRepacker {
 		boolean raster_produced = false;
 		final boolean save_raster = true;
 		final Map<PSDLayer, File> layer_to_file_mapping = Collections.newMap();
-		raster_produced = saveRaster(psd_file, raster_names, used_raster, raster_folder, package_name, save_raster,
-			layer_to_file_mapping, pack_result);
+		{
+			raster_produced = saveRaster(psd_file, raster_names, used_raster, raster_folder, package_name, save_raster,
+				layer_to_file_mapping, pack_result, ignore_atlas);
+		}
 
 		if (!ignore_atlas && raster_produced) {
 			L.d("---[Decomposing Raster]--------------------------------------------");
@@ -408,7 +410,8 @@ public class PSDRepacker {
 
 	static private boolean saveRaster (final File package_root_file, final Map<PSDLayer, ID> raster_names,
 		final Collection<ID> used_raster, final File output_folder, final ID package_name, final boolean save_raster,
-		final Map<PSDLayer, File> layer_to_file_mapping, final ConversionResult pack_result) throws IOException {
+		final Map<PSDLayer, File> layer_to_file_mapping, final ConversionResult pack_result, final boolean ignore_atlas)
+		throws IOException {
 		boolean raster_produced = false;
 		for (int i = 0; i < raster_names.size(); i++) {
 
@@ -426,15 +429,15 @@ public class PSDRepacker {
 
 			final String png_file_name = raster_name + ".png";
 
-			saveRaster(png_file_name, layer, output_folder, save_raster, layer_to_file_mapping, pack_result);
+			saveRaster(png_file_name, layer, output_folder, save_raster, layer_to_file_mapping, pack_result, ignore_atlas);
 
 		}
 		return raster_produced;
 	}
 
 	static private void saveRaster (final String png_file_name, final PSDLayer layer, final File output_folder,
-		final boolean save_raster, final Map<PSDLayer, File> layer_to_file_mapping, final ConversionResult pack_result)
-		throws IOException {
+		final boolean save_raster, final Map<PSDLayer, File> layer_to_file_mapping, final ConversionResult pack_result,
+		final boolean ignore_atlas) throws IOException {
 
 		final File output_file = output_folder.child(png_file_name);
 
@@ -449,17 +452,19 @@ public class PSDRepacker {
 
 		final float scale_factor = result.getScaleFactor();
 
-		BufferedImage out;
+		BufferedImage out = null;
 		if (scale_factor != 1) {
 // final Image tmp = java_image.getScaledInstance((int)(java_image.getWidth() * scale_factor),
 // (int)(java_image.getHeight() * scale_factor), BufferedImage.SCALE_SMOOTH);
 // final Image tmp = ;
-			out = ImageAWT.toBufferedImage(ImageAWT.awtScale(java_image, scale_factor));
+			if (!ignore_atlas) {
+				out = ImageAWT.toBufferedImage(ImageAWT.awtScale(java_image, scale_factor));
+			}
 		} else {
 			out = java_image;
 		}
 
-		if (save_raster) {
+		if (save_raster && !ignore_atlas) {
 			L.d("writing: " + output_file + " " + raster + " scale_factor=" + scale_factor);
 			ImageAWT.writeToFile(out, output_file, "png");
 		}
