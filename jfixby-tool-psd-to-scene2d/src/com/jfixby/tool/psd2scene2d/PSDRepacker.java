@@ -453,7 +453,7 @@ public class PSDRepacker {
 		final float scale_factor = result.getScaleFactor();
 
 		BufferedImage out = null;
-		if (scale_factor != 1) {
+		if (scale_factor < 1) {
 // final Image tmp = java_image.getScaledInstance((int)(java_image.getWidth() * scale_factor),
 // (int)(java_image.getHeight() * scale_factor), BufferedImage.SCALE_SMOOTH);
 // final Image tmp = ;
