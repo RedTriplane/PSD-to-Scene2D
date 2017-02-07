@@ -943,6 +943,17 @@ public class PSDtoScene2DConverter {
 		}
 
 		{
+			final PSDLayer spline = findChild(TAGS.USE_SPLINE, input);
+
+			if (spline == null) {
+				animation_settings.use_spline = true;
+			} else {
+				final String use_spline = readParameter(spline, TAGS.USE_SPLINE);
+				animation_settings.use_spline = Boolean.parseBoolean(use_spline);
+			}
+		}
+
+		{
 			final PSDLayer debug = findChild(TAGS.DEBUG, input);
 
 			if (debug == null) {

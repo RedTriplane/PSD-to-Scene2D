@@ -16,6 +16,7 @@ public class TAGS {
 	public static final String CAMERA_POLICY = "@policy=";
 	public static final String FRAME = "@frame";
 	public static final String IS_LOOPED = "@looped=";
+	public static final String USE_SPLINE = "@use_spline=";
 	public static final String DEBUG = "@debug=";
 	public static final String AUTOSTART = "@autostart=";
 	public static final String ID = "@id=";
