@@ -1037,10 +1037,20 @@ public class PSDtoScene2DConverter {
 		}
 
 		if (animation_settings.is_positions_modifyer_animation) {
+			final PSDLayer scene = findChild(TAGS.ANIMATION_SCENE, input);
+			final PSDLayer origin_layer = findChild(TAGS.ORIGIN, scene);
+			final Float2 origin = Geometry.newFloat2();
+			final double scale_factor = settings.getScaleFactor();
+			if (origin_layer != null) {
+				final PSDRaster raster = origin_layer.getRaster();
+				origin.setXY(raster.getPosition().getX() * scale_factor, raster.getPosition().getY() * scale_factor);
+				origin.scaleXY(-1);
+			}
+
 			final PSDLayer anchors = findChild(TAGS.ANIMATION_ANCHORS, input);
 			Debug.checkNull("frames", anchors);
 			animation_settings.anchors = new Vector<>();
-			final double scale_factor = settings.getScaleFactor();
+
 			for (int i = 0; i < anchors.numberOfChildren(); i++) {
 				final PSDLayer anchor_layer = anchors.getChild(i);
 				final String anchor_time_string = anchor_layer.getName();
@@ -1053,18 +1063,17 @@ public class PSDtoScene2DConverter {
 				animation_settings.anchors.add(anchor);
 			}
 
-			final PSDLayer scene = findChild(TAGS.ANIMATION_SCENE, input);
-			final PSDLayer origin_layer = findChild(TAGS.ORIGIN, scene);
-			final Float2 origin = Geometry.newFloat2();
-			if (origin_layer != null) {
-				final PSDRaster raster = origin_layer.getRaster();
-				origin.setXY(raster.getPosition().getX() * scale_factor, raster.getPosition().getY() * scale_factor);
-			}
 			{
 				// LayerElement element = new LayerElement();
 				// output.children.addElement(element);
 				// convert(scene, element, naming, result);
-
+				if (origin_layer != null) {
+					settings.addOffset(origin);
+				}
+				final LayerElement subLayer = settings.newLayerElement();
+				subLayer.is_sublayer = true;
+				subLayer.name = "frames_container";
+				output.children.addElement(subLayer, structure);
 				for (int i = 0; i < scene.numberOfChildren(); i++) {
 					final PSDLayer child = scene.getChild(i);
 					Debug.checkNull("child", child);
@@ -1072,12 +1081,17 @@ public class PSDtoScene2DConverter {
 						continue;
 					}
 					final LayerElement element = settings.newLayerElement();
-					;
-					output.children.addElement(element, structure);
+					subLayer.children.addElement(element, structure);
 					convert(stack, child, element, settings);
-					element.position_x = element.position_x - origin.getX();
-					element.position_y = element.position_y - origin.getY();
 
+					if (origin_layer == null) {
+						element.position_x = 0;
+						element.position_y = 0;
+					}
+
+				}
+				if (origin_layer != null) {
+					settings.removeOffset();
 				}
 			}
 
@@ -1107,15 +1121,15 @@ public class PSDtoScene2DConverter {
 		final List<String> list = Collections.newList(anchor_time_string.split(":"));
 		list.reverse();
 
-		final long frame = Long.parseLong(list.getElementAt(0));
-		final long second = Long.parseLong(list.getElementAt(1));
+// final long frame = Long.parseLong(list.getElementAt(0));
+		final long ms = Long.parseLong(list.getElementAt(0));
 		long min = 0;
 		if (list.size() > 2) {
 			min = Long.parseLong(list.getElementAt(2));
 		}
-		final long ms = frame * 1000 / 30;
+// final long ms = frame * 1000 / 30;
 
-		return min * 60 * 1000 + second * 1000 + ms;
+		return min * 60 * 1000 + ms;
 	}
 
 	private static String readParameter (final String raw_value, final String prefix) {
