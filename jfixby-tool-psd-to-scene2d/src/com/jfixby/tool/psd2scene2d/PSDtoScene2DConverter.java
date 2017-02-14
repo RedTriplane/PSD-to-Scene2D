@@ -1014,7 +1014,7 @@ public class PSDtoScene2DConverter {
 				for (int i = 0; i < frames.numberOfChildren(); i++) {
 					final PSDLayer child = frames.getChild(i);
 					final LayerElement element = settings.newLayerElement();
-					;
+
 					output.children.addElement(element, structure);
 					convert(stack, child, element, settings);
 				}
@@ -1118,18 +1118,26 @@ public class PSDtoScene2DConverter {
 	}
 
 	private static long getTime (final String anchor_time_string) {
-		final List<String> list = Collections.newList(anchor_time_string.split(":"));
-		list.reverse();
-
-// final long frame = Long.parseLong(list.getElementAt(0));
-		final long ms = Long.parseLong(list.getElementAt(0));
+		final List<String> parts = Collections.newList(anchor_time_string.split(":"));
+		long ms = 0;
+		long sec = 0;
 		long min = 0;
-		if (list.size() > 2) {
-			min = Long.parseLong(list.getElementAt(2));
-		}
-// final long ms = frame * 1000 / 30;
 
-		return min * 60 * 1000 + ms;
+		parts.reverse();
+
+		if (parts.size() > 0) {
+			ms = (long)(1000 * Double.parseDouble(parts.getElementAt(0)));
+		}
+		if (parts.size() > 1) {
+			sec = (long)(1000 * Double.parseDouble(parts.getElementAt(1)));
+		}
+
+		if (parts.size() > 2) {
+			min = (long)(1000 * Double.parseDouble(parts.getElementAt(2)));
+		}
+
+		final long result = min * 60 * 1000 + sec * 1000 + ms;
+		return result;
 	}
 
 	private static String readParameter (final String raw_value, final String prefix) {
