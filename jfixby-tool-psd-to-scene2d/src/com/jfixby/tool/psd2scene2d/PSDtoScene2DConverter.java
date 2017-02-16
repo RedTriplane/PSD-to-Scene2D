@@ -1007,6 +1007,15 @@ public class PSDtoScene2DConverter {
 		}
 
 		if (animation_settings.is_simple_animation) {
+			Long frame_time = null;
+			final PSDLayer frame = findChild(TAGS.FRAME_TIME, input);
+			if (frame == null) {
+
+			} else {
+				final String type_value = readParameter(frame.getName(), TAGS.FRAME_TIME);
+				frame_time = Long.parseLong(type_value);
+			}
+
 			{
 				final PSDLayer frames = findChild(TAGS.ANIMATION_FRAMES, input);
 				if (frames == null) {
@@ -1016,7 +1025,12 @@ public class PSDtoScene2DConverter {
 				for (int i = 0; i < frames.numberOfChildren(); i++) {
 					final PSDLayer child = frames.getChild(i);
 					final LayerElement element = settings.newLayerElement();
-
+					element.animation_settings = new AnimationSettings();
+					if (frame_time != null) {
+						element.animation_settings.frame_time = frame_time + "";
+					} else {
+						element.animation_settings.frame_time = "" + (long)(Double.parseDouble(child.getName()) * 1000d);
+					}
 					output.children.addElement(element, structure);
 					convert(stack, child, element, settings);
 				}
@@ -1024,17 +1038,7 @@ public class PSDtoScene2DConverter {
 					Err.reportError("No frames found for " + output.animation_id);
 				}
 			}
-			{
-				final PSDLayer frame = findChild(TAGS.FRAME_TIME, input);
-				if (frame == null) {
-					// animation_settings.single_frame_time = Long.MAX_VALUE;
-					Err.reportError("Missing frame time tag: @" + TAGS.FRAME_TIME);
 
-				} else {
-					final String type_value = readParameter(frame.getName(), TAGS.FRAME_TIME);
-					animation_settings.single_frame_time = "" + Long.parseLong(type_value);
-				}
-			}
 			return;
 		}
 
