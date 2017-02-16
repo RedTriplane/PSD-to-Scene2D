@@ -972,6 +972,8 @@ public class PSDtoScene2DConverter {
 			} else {
 				final String autostart_string = readParameter(autostart.getName(), TAGS.AUTOSTART);
 				animation_settings.autostart = Boolean.parseBoolean(autostart_string);
+				L.e("", input);
+				Debug.checkTrue("animation_settings.autostart", !animation_settings.autostart);
 			}
 		}
 
