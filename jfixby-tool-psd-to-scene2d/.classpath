@@ -4,13 +4,13 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/scarabei-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-tool-psd-unpacker-api"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/red-triplane-scene2d-api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/red-triplane-api-scene2d-io"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/red-triplane-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-tool-texture-packer-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-tool-texture-slicer-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-cv-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/rana-api"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/red-triplane-shader-api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/red-triplane-api-shader"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/scarabei-api-desktop"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/rana-asset-red"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-tool-texture-bleed-api"/>
