@@ -281,7 +281,10 @@ public class PSDtoScene2DConverter {
 
 			} else {
 				final String type_value = PSDtoScene2DConverter.readParameter(frame.getName(), TAGS.FRAME_TIME);
-				frame_time = Long.parseLong(type_value);
+				frame_time = (long)(Double.parseDouble(type_value) * 1000);
+				if (frame_time > 10000) {
+					Err.reportError("Frame time is too big: " + frame_time);
+				}
 			}
 
 			{
@@ -298,6 +301,7 @@ public class PSDtoScene2DConverter {
 						element.animation_settings.frame_time = frame_time + "";
 					} else {
 						element.animation_settings.frame_time = "" + (long)(Double.parseDouble(child.getName()) * 1000d);
+// L.d("element.animation_settings.frame_time", element.animation_settings.frame_time);
 					}
 					output.children.addElement(element, structure);
 					PSDtoScene2DConverter.convert(stack, child, element, settings);
