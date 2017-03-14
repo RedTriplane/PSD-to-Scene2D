@@ -156,7 +156,7 @@ public class PSDtoScene2DConverter {
 				result_i.setScaleFactor(scale_factor);
 				result_i.setImageQuality(imageQuality);
 
-				container.structures.addElement(structure);
+				container.structures.add(structure);
 				structure.structure_name = PSDtoScene2DConverter.readParameter(name_layer.getName(), TAGS.STRUCTURE_NAME);
 				structure.structure_name = package_prefix.child(structure.structure_name).toString();
 				final LayerElement element = structure.root;
