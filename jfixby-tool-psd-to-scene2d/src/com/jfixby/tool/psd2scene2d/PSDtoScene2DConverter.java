@@ -1,7 +1,7 @@
 
 package com.jfixby.tool.psd2scene2d;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.jfixby.psd.unpacker.api.PSDLayer;
 import com.jfixby.psd.unpacker.api.PSDRaster;
@@ -327,7 +327,7 @@ public class PSDtoScene2DConverter {
 
 			final PSDLayer anchors = PSDtoScene2DConverter.findChild(TAGS.ANIMATION_ANCHORS, input);
 			Debug.checkNull("frames", anchors);
-			animation_settings.anchors = new Vector<>();
+			animation_settings.anchors = new ArrayList<>();
 
 			for (int i = 0; i < anchors.numberOfChildren(); i++) {
 				final PSDLayer anchor_layer = anchors.getChild(i);
@@ -772,8 +772,8 @@ public class PSDtoScene2DConverter {
 				final ShaderParameterValue canvas_y = new ShaderParameterValue(SHADER_PARAMETER.POSITION_Y, "" + shader_y,
 					ShaderParameterType.FLOAT);
 
-				shader_settings.params.addElement(canvas_x);
-				shader_settings.params.addElement(canvas_y);
+				shader_settings.params.add(canvas_x);
+				shader_settings.params.add(canvas_y);
 
 				final PSDLayer radius = shader_node.findChildByNamePrefix(TAGS.RADIUS);
 				if (radius != null) {
@@ -784,7 +784,7 @@ public class PSDtoScene2DConverter {
 					final ShaderParameterValue radius_p = new ShaderParameterValue(SHADER_PARAMETER.RADIUS, "" + shader_radius,
 						ShaderParameterType.FLOAT);
 
-					shader_settings.params.addElement(radius_p);
+					shader_settings.params.add(radius_p);
 
 				} else {
 					Err.reportError("Shader radius not found: " + shader_node);
@@ -1044,7 +1044,7 @@ public class PSDtoScene2DConverter {
 
 	private static void packAnimationEvents (final PSDLayer events_list, final ActionsGroup e_list,
 		final ChildAssetsNameResolver naming) {
-		e_list.actions = new Vector<>();
+		e_list.actions = new ArrayList<>();
 		for (int i = 0; i < events_list.numberOfChildren(); i++) {
 			final PSDLayer element = events_list.getChild(i);
 			String event_id = PSDtoScene2DConverter.readParameter(element, TAGS.ID);
@@ -1054,7 +1054,7 @@ public class PSDtoScene2DConverter {
 			final Action event = new Action();
 			event.animation_id = event_id;
 			event.is_start_animation = true;
-			e_list.actions.addElement(event);
+			e_list.actions.add(event);
 
 		}
 	}

@@ -145,7 +145,7 @@ public class PSDRepacker {
 
 			for (final TextureSlicingResult combo : structures) {
 				final SlicesCompositionInfo composition = combo.getTilesComposition();
-				container.content.addElement(composition);
+				container.content.add(composition);
 				packed_structures.add(Names.newID(composition.composition_asset_id_string));
 				requred_rasters.addAll(combo.listProducedTiles());
 			}
