@@ -17,6 +17,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-tool-texture-compressor-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-tool-texture-compressor-red"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/scarabei-red"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/PNGQuant-api"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

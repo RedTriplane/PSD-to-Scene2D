@@ -55,9 +55,6 @@ import com.jfixby.tools.gdx.texturepacker.api.TexturePacker;
 import com.jfixby.tools.gdx.texturepacker.api.TexturePackingSpecs;
 import com.jfixby.tools.gdx.texturepacker.api.indexed.IndexedCompressor;
 
-import pngquant.java.api.CompressionResult;
-import pngquant.java.api.PNGQuant;
-
 public class PSDRepacker {
 
 	public static PSDRepackerResult repackPSD (final PSDRepackSettings settings, final PSDRepackingStatus handler)
@@ -80,7 +77,7 @@ public class PSDRepacker {
 		final boolean forceRasterDecomposition = settings.forceRasterDecomposition();
 		final boolean useIndexCompression = settings.useIndexCompression();
 		final boolean useInMemoryFileSystem = settings.useInMemoryFileSystem();
-		final boolean usePNGQuant = settings.usePNGQuant();
+// final boolean usePNGQuant = settings.usePNGQuant();
 
 		final File tmp;
 		final FileSystem FS;
@@ -206,13 +203,13 @@ public class PSDRepacker {
 						result.addCompressionInfo(file_name, originalSize, newSize);
 
 					}
-					if (usePNGQuant) {
-						final CompressionResult PNGQuantresult = PNGQuant.compress(outputPng, outputPng);
-						if (!PNGQuantresult.isOK()) {
-						}
-						PNGQuantresult.print("" + outputPng);
-
-					}
+// if (usePNGQuant) {
+// final CompressionResult PNGQuantresult = PNGQuant.compress(outputPng, outputPng);
+// if (!PNGQuantresult.isOK()) {
+// }
+// PNGQuantresult.print("" + outputPng);
+//
+// }
 				} catch (final Exception e) {
 					Err.reportError(e);
 				}

@@ -20,7 +20,7 @@ public class PSDRepackSettings {
 	private int altas_min_page_size;
 	private boolean useIndexCompression;
 	private boolean useInMemoryFileSystem;
-	private boolean usePNGQuant;
+// private boolean usePNGQuant;
 
 	public void setPSDFile (final File psd_file) {
 		this.psd_file = psd_file;
@@ -126,12 +126,12 @@ public class PSDRepackSettings {
 		return this.useInMemoryFileSystem;
 	}
 
-	public void usePNGQuant (final boolean usePNGQuant) {
-		this.usePNGQuant = usePNGQuant;
-	}
-
-	public boolean usePNGQuant () {
-		return this.usePNGQuant;
-	}
+// public void usePNGQuant (final boolean usePNGQuant) {
+// this.usePNGQuant = usePNGQuant;
+// }
+//
+// public boolean usePNGQuant () {
+// return this.usePNGQuant;
+// }
 
 }
