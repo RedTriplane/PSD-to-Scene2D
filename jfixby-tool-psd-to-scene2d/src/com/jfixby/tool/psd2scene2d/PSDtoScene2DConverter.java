@@ -31,6 +31,7 @@ import com.jfixby.scarabei.api.assets.Names;
 import com.jfixby.scarabei.api.collections.Collections;
 import com.jfixby.scarabei.api.collections.List;
 import com.jfixby.scarabei.api.collections.Map;
+import com.jfixby.scarabei.api.color.Colors;
 import com.jfixby.scarabei.api.debug.Debug;
 import com.jfixby.scarabei.api.err.Err;
 import com.jfixby.scarabei.api.floatn.Float2;
@@ -855,17 +856,25 @@ public class PSDtoScene2DConverter {
 			Logger.d("text_node", text_node);
 			if (text_node != null) {
 				final PSDLayer id = PSDtoScene2DConverter.findChild(TAGS.ID, text_node);
-				if (id == null) {
-					Err.reportError("Missing tag <@" + TAGS.ID + ">");
+				final PSDLayer string = PSDtoScene2DConverter.findChild(TAGS.STRING, text_node);
+
+				if (id == null && string == null) {
+					Err.reportError("Missing tag <" + TAGS.ID + ">");
 				} else {
-					final String text_value_asset_id_string = PSDtoScene2DConverter.readParameter(id, TAGS.ID);
-					final PsdRepackerNameResolver naming = settings.getNaming();
-					final ID text_value_asset_id = Names.newID(text_value_asset_id_string);
+					if (id != null) {
+						final String text_value_asset_id_string = PSDtoScene2DConverter.readParameter(id, TAGS.ID);
+						final PsdRepackerNameResolver naming = settings.getNaming();
+						final ID text_value_asset_id = Names.newID(text_value_asset_id_string);
 // final AssetID text_value_asset_id = naming.childText(text_value_asset_id_string);
 
-					output.text_settings.text_value_asset_id = text_value_asset_id.toString();
-					final SceneStructurePackingResult result = settings.getResult();
-					result.addRequiredAsset(text_value_asset_id, Collections.newList(input));
+						output.text_settings.text_value_asset_id = text_value_asset_id.toString();
+						final SceneStructurePackingResult result = settings.getResult();
+						result.addRequiredAsset(text_value_asset_id, Collections.newList(input));
+					}
+					if (string != null) {
+						final String stringTest = PSDtoScene2DConverter.readStrings(string);
+						output.text_settings.text_value_raw = stringTest;
+					}
 				}
 // final AssetID child_scene_asset_id = null;
 // result.addRequiredRaster(child_scene_asset_id, JUtils.newList(input_parent, input, background));
@@ -875,14 +884,25 @@ public class PSDtoScene2DConverter {
 		{
 			final PSDLayer font_node = input.findChildByNamePrefix(TAGS.FONT);
 			if (font_node != null) {
-				final PSDLayer size = PSDtoScene2DConverter.findChild(TAGS.SIZE, font_node);
-				if (size == null) {
-					Err.reportError("Missing tag <@" + TAGS.SIZE + ">");
-				} else {
-					final String font_size_string = PSDtoScene2DConverter.readParameter(size.getName(), TAGS.SIZE);
-					output.text_settings.font_settings.font_size = (Float.parseFloat(font_size_string));
-					output.text_settings.font_settings.font_scale = (float)scale_factor;
-					output.text_settings.font_settings.value_is_in_pixels = true;
+				{
+					final PSDLayer size = PSDtoScene2DConverter.findChild(TAGS.SIZE, font_node);
+					if (size == null) {
+						Err.reportError("Missing tag <@" + TAGS.SIZE + ">");
+					} else {
+						final String font_size_string = PSDtoScene2DConverter.readParameter(size.getName(), TAGS.SIZE);
+						output.text_settings.font_settings.font_size = (Float.parseFloat(font_size_string));
+						output.text_settings.font_settings.font_scale = (float)scale_factor;
+						output.text_settings.font_settings.value_is_in_pixels = true;
+					}
+				}
+				{
+					final PSDLayer color = PSDtoScene2DConverter.findChild(TAGS.COLOR, font_node);
+					if (color == null) {
+						Err.reportError("Missing tag <@" + TAGS.COLOR + ">");
+					} else {
+						final String font_color_string = PSDtoScene2DConverter.readParameter(color.getName(), TAGS.COLOR);
+						output.text_settings.font_settings.font_color = "#" + Colors.newColor(font_color_string).toFullHexString();
+					}
 				}
 				// AssetID child_scene_asset_id = null;
 				// result.addRequiredRaster(child_scene_asset_id,
@@ -902,6 +922,15 @@ public class PSDtoScene2DConverter {
 				output.text_settings.padding = (float)(Float.parseFloat(padding_string) * scale_factor);
 			}
 		}
+	}
+
+	private static String readStrings (final PSDLayer string) {
+		final StringBuilder b = new StringBuilder();
+		for (int i = 0; i < string.numberOfChildren(); i++) {
+			b.append(string.getChild(i).getName());
+			b.append("\n");
+		}
+		return b.toString();
 	}
 
 	private static void extractButtonOptions (final LayersStack stack, final PSDLayer options, final LayerElement output,
