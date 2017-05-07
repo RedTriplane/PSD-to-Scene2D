@@ -815,6 +815,7 @@ public class PSDtoScene2DConverter {
 			}
 		}
 		{
+
 			final double scale_factor = settings.getScaleFactor();
 			final PSDLayer background = input.findChildByNamePrefix(TAGS.BACKGROUND);
 			if (background != null) {
@@ -927,8 +928,11 @@ public class PSDtoScene2DConverter {
 	private static String readStrings (final PSDLayer string) {
 		final StringBuilder b = new StringBuilder();
 		for (int i = 0; i < string.numberOfChildren(); i++) {
+			if (i != 0) {
+				b.append("\n");
+			}
 			b.append(string.getChild(i).getName());
-			b.append("\n");
+
 		}
 		return b.toString();
 	}
