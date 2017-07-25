@@ -1,9 +1,9 @@
 
 package com.jfixby.tool.psd2scene2d;
 
-import com.jfixby.r3.ext.api.scene2d.srlz.LayerElement;
-import com.jfixby.r3.ext.api.scene2d.srlz.LayerElementFactory;
-import com.jfixby.r3.ext.api.scene2d.srlz.SceneStructure;
+import com.jfixby.r3.io.scene2d.LayerElement;
+import com.jfixby.r3.io.scene2d.LayerElementFactory;
+import com.jfixby.r3.io.scene2d.SceneStructure;
 import com.jfixby.scarabei.api.collections.Collections;
 import com.jfixby.scarabei.api.collections.List;
 import com.jfixby.scarabei.api.floatn.Float2;

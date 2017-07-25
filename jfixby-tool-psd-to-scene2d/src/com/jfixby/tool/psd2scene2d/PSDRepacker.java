@@ -12,10 +12,12 @@ import com.jfixby.psd.unpacker.api.PSDRasterPosition;
 import com.jfixby.psd.unpacker.api.PSDRootLayer;
 import com.jfixby.psd.unpacker.api.PSDUnpacker;
 import com.jfixby.psd.unpacker.api.PSDUnpackingParameters;
-import com.jfixby.r3.ext.api.scene2d.srlz.Scene2DPackage;
-import com.jfixby.rana.api.pkg.StandardPackageFormats;
-import com.jfixby.rana.api.pkg.fs.PackageDescriptor;
-import com.jfixby.red.engine.core.resources.PackageUtils;
+import com.jfixby.r3.fokker.texture.api.FokkerTexturePackageReader;
+import com.jfixby.r3.io.scene2d.Scene2DPackage;
+import com.jfixby.r3.io.texture.slicer.SlicesCompositionInfo;
+import com.jfixby.r3.io.texture.slicer.SlicesCompositionsContainer;
+import com.jfixby.r3.rana.api.pkg.io.PackageDescriptor;
+import com.jfixby.r3.rana.red.pkg.bank.PackageUtils;
 import com.jfixby.scarabei.api.assets.ID;
 import com.jfixby.scarabei.api.assets.Names;
 import com.jfixby.scarabei.api.collections.Collection;
@@ -41,8 +43,6 @@ import com.jfixby.scarabei.api.log.L;
 import com.jfixby.scarabei.api.math.FloatMath;
 import com.jfixby.scarabei.api.math.IntegerMath;
 import com.jfixby.scarabei.red.filesystem.virtual.InMemoryFileSystem;
-import com.jfixby.texture.slicer.api.SlicesCompositionInfo;
-import com.jfixby.texture.slicer.api.SlicesCompositionsContainer;
 import com.jfixby.texture.slicer.api.TextureSlicer;
 import com.jfixby.texture.slicer.api.TextureSlicerSpecs;
 import com.jfixby.texture.slicer.api.TextureSlicingResult;
@@ -53,7 +53,6 @@ import com.jfixby.tools.gdx.texturepacker.api.AtlasPackingResult;
 import com.jfixby.tools.gdx.texturepacker.api.Packer;
 import com.jfixby.tools.gdx.texturepacker.api.TexturePacker;
 import com.jfixby.tools.gdx.texturepacker.api.TexturePackingSpecs;
-import com.jfixby.tools.gdx.texturepacker.api.indexed.IndexedCompressor;
 
 public class PSDRepacker {
 
@@ -164,9 +163,8 @@ public class PSDRepacker {
 				// used_raster.print("used_raster");
 				// packed_structures.print("packed_structures");
 				// Sys.exit();
-				PackageUtils.producePackageDescriptor(container_file.parent().parent(),
-					StandardPackageFormats.RedTriplane.TiledRaster, "1.0", packed_structures, requred_rasters,
-					container_file.getName());
+				PackageUtils.producePackageDescriptor(container_file.parent().parent(), SlicesCompositionsContainer.PACKAGE_FORMAT,
+					"1.0", packed_structures, requred_rasters, container_file.getName());
 
 			}
 
@@ -196,7 +194,8 @@ public class PSDRepacker {
 						FS.copyFileToFile(file, outputPng);
 					} else {
 						L.d("compressing", file_name);
-						IndexedCompressor.compressFile(file, outputPng);
+						Err.throwNotImplementedYet();
+// IndexedCompressor.compressFile(file, outputPng);
 						final long originalSize = file.getSize();
 						final long newSize = outputPng.getSize();
 
@@ -234,8 +233,8 @@ public class PSDRepacker {
 			packed_rasters.addAll(atlas_result.listPackedAssets());
 
 			final File atlasPackageFolder = atlas_output.parent();
-			PackageUtils.producePackageDescriptor(atlasPackageFolder, StandardPackageFormats.libGDX.Atlas, "1.0", packed_rasters,
-				Collections.newList(), atlas_name);
+			PackageUtils.producePackageDescriptor(atlasPackageFolder, FokkerTexturePackageReader.PACKAGE_FORMAT_ATLAS, "1.0",
+				packed_rasters, Collections.newList(), atlas_name);
 
 			// requred_rasters.print("requred_rasters");
 			// packed_rasters.print("packed_rasters");
