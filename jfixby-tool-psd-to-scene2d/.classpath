@@ -5,23 +5,22 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/scarabei-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/psd-unpacker-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jfixby-cv-api"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/rana-api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/r3-rana-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/scarabei-api-desktop"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/scarabei-red"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fokker-io"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fokker-shader-io"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/rana-io"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/rana-packer"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/scene2d-io"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/r3-fokker-io"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/r3-fokker-shader-io"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/r3-rana-io"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/r3-scene2d-io"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/texture-packer-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/texture-packer-gdx"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/texture-slicer-api"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/texture-slicer-io"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/r3-texture-slicer-io"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/texture-slicer-red"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/rana-red"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/r3-rana-red"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/psd-unpacker-red"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/texture-bleed-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/texture-bleed-red"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fokker-engine"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/r3-fokker-engine"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
