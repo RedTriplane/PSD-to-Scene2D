@@ -19,9 +19,6 @@ dependencies {
       compile project(":red-triplane-api")
       compile project(":red-triplane-scene2d-api")
       compile project(":red-triplane-shader-api")
-      compile project(":scarabei-api")
-      compile project(":scarabei-api-desktop")
-      compile project(":scarabei-red")
 }
 
 sourceSets {
