@@ -174,7 +174,7 @@ public class PSDRepacker {
 			final AtlasPackingResult atlas_result = packAtlas(atlas_folder, tiling_folder,
 				package_name.child("psd").child("raster").toString(), max_page_size, min_page_size, padding);
 
-			atlas_result.print();
+// atlas_result.print();
 
 			File altas_file = atlas_result.getAtlasOutputFile();
 			final String atlas_name = altas_file.getName();

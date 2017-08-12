@@ -400,7 +400,7 @@ public class PSDtoScene2DConverter {
 
 		final PSDLayer origin = input.findChildByNamePrefix(TAGS.ORIGIN);
 		if (origin != null) {
-			stack.print();
+// stack.print();
 			Err.reportError("Tag deprecated: <" + TAGS.ORIGIN + ">");
 // final double scale_factor = settings.getScaleFactor();
 // output.child_scene_settings.frame_position_x = origin.getRaster().getPosition().getX() * scale_factor;
@@ -452,7 +452,7 @@ public class PSDtoScene2DConverter {
 				PSDtoScene2DConverter.convert(stack, child, element, settings);
 
 				if (element.name.startsWith("@")) {
-					stack.print();
+// stack.print();
 					Err.reportError("Bad layer name: " + element.name);
 				}
 			}
@@ -474,7 +474,7 @@ public class PSDtoScene2DConverter {
 
 		final PSDLayer id = PSDtoScene2DConverter.findChild(TAGS.ID, input);
 		if (id != null) {
-			stack.print();
+// stack.print();
 // Err.reportError("Tag depricated: <" + TAGS.ID + ">");
 		}
 
@@ -531,7 +531,7 @@ public class PSDtoScene2DConverter {
 // final PSDLayer dimentions = area.getChild(0);
 // extractTouchArea(stack, dimentions, output, settings, origin);
 			} else {
-				stack.print();
+// stack.print();
 				Err.reportError("Unknown input type: " + type);
 			}
 
@@ -684,7 +684,7 @@ public class PSDtoScene2DConverter {
 			final PSDLayer type = progress.findChildByNamePrefix(TAGS.TYPE);
 
 			if (type == null) {
-				stack.print();
+// stack.print();
 				input_parent.printChildren();
 				Err.reportError("Missing tag <" + TAGS.TYPE + ">");
 			} else {
@@ -697,7 +697,7 @@ public class PSDtoScene2DConverter {
 			final PSDLayer raster = progress.findChildByNamePrefix(TAGS.RASTER);
 
 			if (raster == null) {
-				stack.print();
+// stack.print();
 				Err.reportError("Missing tag <@" + TAGS.RASTER + ">");
 			} else {
 				final LayerElement rasterNode = settings.newLayerElement();
@@ -949,7 +949,7 @@ public class PSDtoScene2DConverter {
 
 			PSDtoScene2DConverter.convert(stack, child, converted, settings);
 			if (!converted.is_raster) {
-				stack.print();
+// stack.print();
 				Err.reportError(converted + "");
 			}
 			final SceneStructure structure = settings.getStructure();
@@ -1032,7 +1032,7 @@ public class PSDtoScene2DConverter {
 
 		PSDtoScene2DConverter.convert(stack, area, converted, settings);
 		if (!converted.is_raster) {
-			stack.print();
+// stack.print();
 			Err.reportError(converted + "");
 		}
 		final SceneStructure structure = settings.getStructure();

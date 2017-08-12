@@ -16,8 +16,8 @@ public class LayersStack {
 		this.stack.add(input);
 	}
 
-	public void print () {
-		this.stack.print("LayersStack");
-	}
+// public void print () {
+// this.stack.print("LayersStack");
+// }
 
 }

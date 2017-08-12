@@ -41,7 +41,7 @@ public class ConversionResult {
 
 		final SceneStructurePackingResult result = this.ancestors.get(layer);
 		if (result == null) {
-			this.ancestors.print("ancestors");
+// this.ancestors.print("ancestors");
 
 			L.d("layer", layer);
 
