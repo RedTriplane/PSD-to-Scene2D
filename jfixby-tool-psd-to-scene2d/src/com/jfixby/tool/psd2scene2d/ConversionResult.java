@@ -3,13 +3,13 @@ package com.jfixby.tool.psd2scene2d;
 
 import com.jfixby.psd.unpacker.api.PSDLayer;
 import com.jfixby.r3.io.scene2d.SceneStructure;
-import com.jfixby.scarabei.api.assets.ID;
 import com.jfixby.scarabei.api.collections.Collection;
 import com.jfixby.scarabei.api.collections.Collections;
 import com.jfixby.scarabei.api.collections.List;
 import com.jfixby.scarabei.api.collections.Map;
 import com.jfixby.scarabei.api.err.Err;
 import com.jfixby.scarabei.api.log.L;
+import com.jfixby.scarabei.api.names.ID;
 
 public class ConversionResult {
 
