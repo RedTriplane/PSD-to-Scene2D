@@ -147,7 +147,7 @@ public class PSDRepacker {
 			}
 
 			if (container.content.size() > 0) {
-				final ID sctruct_package_name = package_name.child("psd").child(TextureSlicerSpecs.TILE_MAP_FILE_EXTENSION);
+				final ID sctruct_package_name = package_name.child(TextureSlicerSpecs.TILE_MAP_FILE_EXTENSION);
 
 				final String struct_pkg_name = sctruct_package_name.toString();
 				File container_file = repacking_output.child(struct_pkg_name);
@@ -171,8 +171,8 @@ public class PSDRepacker {
 			L.d("---[Packing Atlas]--------------------------------------------");
 			final File atlas_folder = temp_folder.child("atlas");
 			atlas_folder.makeFolder();
-			final AtlasPackingResult atlas_result = packAtlas(atlas_folder, tiling_folder,
-				package_name.child("psd").child("raster").toString(), max_page_size, min_page_size, padding);
+			final AtlasPackingResult atlas_result = packAtlas(atlas_folder, tiling_folder, package_name.child("raster").toString(),
+				max_page_size, min_page_size, padding);
 
 // atlas_result.print();
 
@@ -273,7 +273,7 @@ public class PSDRepacker {
 
 		for (int i = 0; i < rasters.size(); i++) {
 			final PSDLayer element = rasters.getElementAt(i);
-			final ID raster_name = Names.newID(package_name + ".psd.raster_" + k);
+			final ID raster_name = Names.newID(package_name + ".raster_" + k);
 			raster_names.put(element, raster_name);
 			k++;
 		}

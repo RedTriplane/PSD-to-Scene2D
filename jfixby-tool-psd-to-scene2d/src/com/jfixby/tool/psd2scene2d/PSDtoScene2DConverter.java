@@ -17,6 +17,7 @@ import com.jfixby.r3.io.scene2d.CameraSettings.MODE;
 import com.jfixby.r3.io.scene2d.ChildSceneSettings;
 import com.jfixby.r3.io.scene2d.InputSettings;
 import com.jfixby.r3.io.scene2d.LayerElement;
+import com.jfixby.r3.io.scene2d.NinePatchSettings;
 import com.jfixby.r3.io.scene2d.ParallaxSettings;
 import com.jfixby.r3.io.scene2d.ProgressSettings;
 import com.jfixby.r3.io.scene2d.RASTER_BLEND_MODE;
@@ -34,6 +35,7 @@ import com.jfixby.scarabei.api.debug.Debug;
 import com.jfixby.scarabei.api.err.Err;
 import com.jfixby.scarabei.api.floatn.Float2;
 import com.jfixby.scarabei.api.geometry.Geometry;
+import com.jfixby.scarabei.api.log.L;
 import com.jfixby.scarabei.api.log.Logger;
 import com.jfixby.scarabei.api.math.FloatMath;
 import com.jfixby.scarabei.api.names.ID;
@@ -47,7 +49,8 @@ public class PSDtoScene2DConverter {
 		if (input.isFolder()) {
 			stack.push(input);
 			final String name = input.getName();
-// L.d("convert layer", name);
+			L.d("convert layer", name);
+
 			final PSDLayer animation_node = input.findChildByNamePrefix(TAGS.ANIMATION);
 			final PSDLayer childscene_node = input.findChildByNamePrefix(TAGS.CHILD_SCENE);
 			final PSDLayer text_node = input.findChildByNamePrefix(TAGS.R3_TEXT);
@@ -55,6 +58,7 @@ public class PSDtoScene2DConverter {
 			final PSDLayer user_input = input.findChildByNamePrefix(TAGS.INPUT);
 			final PSDLayer progress = input.findChildByNamePrefix(TAGS.PROGRESS);
 			final PSDLayer parallax = input.findChildByNamePrefix(TAGS.PARALLAX);
+			final PSDLayer ninePatch = input.findChildByNamePrefix(TAGS.NINE_PATCH);
 			// PSDLayer events_node = input.findChild(EVENT);
 			if (animation_node != null) {
 				if (input.numberOfChildren() != 1) {
@@ -71,6 +75,11 @@ public class PSDtoScene2DConverter {
 					Err.reportError("Annotation problem (only one child allowed). This is not an	 child scene node: " + input);
 				}
 				PSDtoScene2DConverter.convertShader(input, output, settings);
+			} else if (ninePatch != null) {
+				if (input.numberOfChildren() != 1) {
+					Err.reportError("Annotation problem (only one child allowed). This is not an	 child scene node: " + input);
+				}
+				PSDtoScene2DConverter.convert9Patch(stack, input, output, settings);
 			} else if (text_node != null) {
 				if (input.numberOfChildren() != 1) {
 					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
@@ -98,6 +107,12 @@ public class PSDtoScene2DConverter {
 				// convertEventsSequence(input, output, naming, result,
 				// scale_factor);
 			} else {
+
+				if (name.startsWith("@") && !name.startsWith(TAGS.CONTENT)) {
+					L.d(stack);
+					Err.reportError("Bad layer name: " + name);
+				}
+
 				PSDtoScene2DConverter.convertFolder(stack, input, output, settings);
 			}
 			stack.pop(input);
@@ -429,6 +444,37 @@ public class PSDtoScene2DConverter {
 
 	}
 
+	private static void convert9Patch (final LayersStack stack, final PSDLayer input_parent, final LayerElement output,
+		final ConvertionSettings settings) {
+
+		final String name = input_parent.getName();
+		output.is_hidden = !input_parent.isVisible();
+		output.is_9_patch = true;
+		output.name = name;
+
+		final PSDLayer ninePatch = input_parent.findChildByNamePrefix(TAGS.NINE_PATCH);
+		Debug.checkNull("ninePatch", ninePatch);
+
+		final PSDLayer insideArea = ninePatch.findChildByName(TAGS.AREA);
+		Debug.checkNull("insideArea", insideArea);
+
+		output.nine_patch_settings = new NinePatchSettings();
+
+		output.nine_patch_settings.TL.x = insideArea.getRaster().getPosition().getX();
+		output.nine_patch_settings.TL.y = insideArea.getRaster().getPosition().getY();
+
+		output.nine_patch_settings.BR.x = output.nine_patch_settings.TL.x + insideArea.getRaster().getPosition().getWidth();
+		output.nine_patch_settings.BR.y = output.nine_patch_settings.TL.y + insideArea.getRaster().getPosition().getHeight();
+
+		output.nine_patch_settings.TR.x = output.nine_patch_settings.BR.x;
+		output.nine_patch_settings.TR.y = output.nine_patch_settings.TL.y;
+
+		output.nine_patch_settings.BL.x = output.nine_patch_settings.TL.x;
+		output.nine_patch_settings.BL.y = output.nine_patch_settings.BR.y;
+
+// L.d();
+	}
+
 	private static void convertFolder (final LayersStack stack, final PSDLayer input, final LayerElement coutput,
 		final ConvertionSettings settings) {
 
@@ -442,19 +488,17 @@ public class PSDtoScene2DConverter {
 
 			for (int i = 0; i < input.numberOfChildren(); i++) {
 				final PSDLayer child = input.getChild(i);
-				// if (shader_node != null && shader_node == child) {
-				// continue;
-				// }
 				final LayerElement element = settings.newLayerElement();
-				;
 				final SceneStructure structure = settings.getStructure();
 				output.children.addElement(element, structure);
+
 				PSDtoScene2DConverter.convert(stack, child, element, settings);
 
 				if (element.name.startsWith("@")) {
-// stack.print();
+					L.d(stack);
 					Err.reportError("Bad layer name: " + element.name);
 				}
+
 			}
 		}
 	}
@@ -1200,7 +1244,14 @@ public class PSDtoScene2DConverter {
 
 		final PSDLayer area = camera_layer.findChildByNamePrefix(TAGS.AREA);
 		final PSDLayer mode = camera_layer.findChildByNamePrefix(TAGS.MODE);
-		final PSDLayer origin = camera_layer.findChildByNamePrefix(TAGS.ORIGIN);
+		PSDLayer origin = camera_layer.findChildByNamePrefix(TAGS.ORIGIN);
+
+		if (origin == null) {
+			origin = area;
+			L.d("stack", stack);
+		}
+		Debug.checkNull("origin", origin);
+		Debug.checkNull("area", area);
 
 		Debug.checkNull("mode", mode);
 		final String modeString = PSDtoScene2DConverter.readParameter(mode, TAGS.MODE);

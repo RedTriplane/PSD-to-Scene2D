@@ -10,6 +10,7 @@ public class TAGS {
 	public static final String INPUT = "@r3.input";
 	public static final String PROGRESS = "@progress";
 	public static final String PARALLAX = "@parallax";
+	public static final String NINE_PATCH = "@9patch";
 	public static final String RASTER = "@raster";
 	public static final String STRUCTURE_NAME = "@name=";
 	public static final String CAMERA = "@camera";
