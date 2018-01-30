@@ -452,6 +452,10 @@ public class PSDtoScene2DConverter {
 		output.is_9_patch = true;
 		output.name = name;
 
+// if (1 == 1) {
+// return;
+// }
+
 		final PSDLayer ninePatch = input_parent.findChildByNamePrefix(TAGS.NINE_PATCH);
 		Debug.checkNull("ninePatch", ninePatch);
 
@@ -460,17 +464,17 @@ public class PSDtoScene2DConverter {
 
 		output.nine_patch_settings = new NinePatchSettings();
 
-		output.nine_patch_settings.TL.x = insideArea.getRaster().getPosition().getX();
-		output.nine_patch_settings.TL.y = insideArea.getRaster().getPosition().getY();
-
-		output.nine_patch_settings.BR.x = output.nine_patch_settings.TL.x + insideArea.getRaster().getPosition().getWidth();
-		output.nine_patch_settings.BR.y = output.nine_patch_settings.TL.y + insideArea.getRaster().getPosition().getHeight();
-
-		output.nine_patch_settings.TR.x = output.nine_patch_settings.BR.x;
-		output.nine_patch_settings.TR.y = output.nine_patch_settings.TL.y;
-
-		output.nine_patch_settings.BL.x = output.nine_patch_settings.TL.x;
-		output.nine_patch_settings.BL.y = output.nine_patch_settings.BR.y;
+// output.nine_patch_settings.TL.x = insideArea.getRaster().getPosition().getX();
+// output.nine_patch_settings.TL.y = insideArea.getRaster().getPosition().getY();
+//
+// output.nine_patch_settings.BR.x = output.nine_patch_settings.TL.x + insideArea.getRaster().getPosition().getWidth();
+// output.nine_patch_settings.BR.y = output.nine_patch_settings.TL.y + insideArea.getRaster().getPosition().getHeight();
+//
+// output.nine_patch_settings.TR.x = output.nine_patch_settings.BR.x;
+// output.nine_patch_settings.TR.y = output.nine_patch_settings.TL.y;
+//
+// output.nine_patch_settings.BL.x = output.nine_patch_settings.TL.x;
+// output.nine_patch_settings.BL.y = output.nine_patch_settings.BR.y;
 
 // L.d();
 	}
@@ -863,6 +867,9 @@ public class PSDtoScene2DConverter {
 			final double scale_factor = settings.getScaleFactor();
 			final PSDLayer background = input.findChildByNamePrefix(TAGS.BACKGROUND);
 			if (background != null) {
+				if (background.numberOfChildren() == 0) {
+					L.d("", stack);
+				}
 				final PSDLayer child = background.getChild(0);
 				final LayerElement raster_element = settings.newLayerElement();
 				PSDtoScene2DConverter.convertRaster(child, raster_element, settings);
@@ -943,7 +950,7 @@ public class PSDtoScene2DConverter {
 				{
 					final PSDLayer color = PSDtoScene2DConverter.findChild(TAGS.COLOR, font_node);
 					if (color == null) {
-						Err.reportError("Missing tag <@" + TAGS.COLOR + ">");
+						Err.reportError("Missing tag <" + TAGS.COLOR + ">");
 					} else {
 						final String font_color_string = PSDtoScene2DConverter.readParameter(color.getName(), TAGS.COLOR);
 						output.text_settings.font_settings.font_color = "#" + Colors.newColor(font_color_string).toFullHexString();
