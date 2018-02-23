@@ -22,5 +22,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/texture-bleed-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/texture-bleed-red"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/r3-fokker-engine"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/r3-fokker-raster-api"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

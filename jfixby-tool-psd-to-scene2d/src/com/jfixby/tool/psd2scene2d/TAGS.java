@@ -21,7 +21,7 @@ public class TAGS {
 	public static final String DEBUG = "@debug=";
 	public static final String AUTOSTART = "@autostart=";
 	public static final String ID = "@id=";
-	public static final String STRING = "@string";
+// public static final String STRING = "@string";
 	public static final String SIZE = "@size=";
 	public static final String COLOR = "@color=";
 

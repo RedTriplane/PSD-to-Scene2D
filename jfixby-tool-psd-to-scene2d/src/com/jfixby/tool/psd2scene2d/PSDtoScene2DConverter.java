@@ -864,7 +864,6 @@ public class PSDtoScene2DConverter {
 		}
 		{
 
-			final double scale_factor = settings.getScaleFactor();
 			final PSDLayer background = input.findChildByNamePrefix(TAGS.BACKGROUND);
 			if (background != null) {
 				if (background.numberOfChildren() == 0) {
@@ -875,22 +874,30 @@ public class PSDtoScene2DConverter {
 				PSDtoScene2DConverter.convertRaster(child, raster_element, settings);
 				output.children.addElement(raster_element, structure);
 
-				raster_element.position_x = 0;
-				raster_element.position_y = 0;
+// raster_element.position_x = 0;
+// raster_element.position_y = 0;
 
-				final PSDRaster raster = child.getRaster();
-				output.position_x = raster.getPosition().getX() * scale_factor;
-				output.position_y = raster.getPosition().getY() * scale_factor;
-
-				// String text_value_asset_id_string =
-				// readParameter(id.getName(), TAGS.ID);
-				// AssetID text_value_asset_id =
-				// naming.childText(text_value_asset_id_string);
-				// output.text_settings.text_value_asset_id =
-				// text_value_asset_id.toString();
-				// result.addRequiredAsset(text_value_asset_id,
-				// JUtils.newList(input));
 			}
+		}
+		{
+			final PSDLayer origin = input.findChildByNamePrefix(TAGS.ORIGIN);
+			if (origin == null) {
+				L.d("stack", stack);
+			}
+
+			Debug.checkNull("origin", origin);
+
+			final PSDRaster originRaster = origin.getChild(0).getRaster();
+			if (originRaster == null) {
+				L.d("stack", stack);
+			}
+			Debug.checkNull("raster", originRaster);
+
+			final double scale_factor = settings.getScaleFactor();
+
+			output.position_x = originRaster.getPosition().getX() * scale_factor;
+			output.position_y = originRaster.getPosition().getY() * scale_factor;
+
 		}
 		{
 			final PSDLayer id = PSDtoScene2DConverter.findChild(TAGS.ID, input);
@@ -908,9 +915,9 @@ public class PSDtoScene2DConverter {
 			Logger.d("text_node", text_node);
 			if (text_node != null) {
 				final PSDLayer id = PSDtoScene2DConverter.findChild(TAGS.ID, text_node);
-				final PSDLayer string = PSDtoScene2DConverter.findChild(TAGS.STRING, text_node);
+// final PSDLayer string = PSDtoScene2DConverter.findChild(TAGS.STRING, text_node);
 
-				if (id == null && string == null) {
+				if (id == null) {
 					Err.reportError("Missing tag <" + TAGS.ID + ">");
 				} else {
 					if (id != null) {
@@ -923,10 +930,10 @@ public class PSDtoScene2DConverter {
 						final SceneStructurePackingResult result = settings.getResult();
 						result.addRequiredAsset(text_value_asset_id, Collections.newList(input));
 					}
-					if (string != null) {
-						final String stringTest = PSDtoScene2DConverter.readStrings(string);
-						output.text_settings.text_value_raw = stringTest;
-					}
+// if (string != null) {
+// final String stringTest = PSDtoScene2DConverter.readStrings(string);
+// output.text_settings.text_value_raw = stringTest;
+// }
 				}
 // final AssetID child_scene_asset_id = null;
 // result.addRequiredRaster(child_scene_asset_id, JUtils.newList(input_parent, input, background));
@@ -1257,6 +1264,7 @@ public class PSDtoScene2DConverter {
 			origin = area;
 			L.d("stack", stack);
 		}
+
 		Debug.checkNull("origin", origin);
 		Debug.checkNull("area", area);
 
