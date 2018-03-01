@@ -618,8 +618,8 @@ public class PSDtoScene2DConverter {
 					PSDtoScene2DConverter.convert(stack, child, element, settings);
 
 					if (origin_layer == null) {
-						element.position_x = 0;
-						element.position_y = 0;
+						element.position_x = 0d;
+						element.position_y = 0d;
 					}
 
 				}
