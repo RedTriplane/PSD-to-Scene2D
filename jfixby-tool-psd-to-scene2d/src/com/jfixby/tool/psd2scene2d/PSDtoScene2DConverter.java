@@ -227,9 +227,8 @@ public class PSDtoScene2DConverter {
 		childScene.child_scene_settings = new ChildSceneSettings();
 
 		final PSDLayer child_scene_node = child.findChildByNamePrefix(TAGS.CHILD_SCENE);
-		if (child_scene_node == null) {
+		if (child_scene_node != null) {
 			final String child_id = PSDtoScene2DConverter.findAndReadParameter(child_scene_node, TAGS.ID);
-as;;kljdalskfjdk
 			final ID child_scene_asset_id = Names.newID(child_id);
 
 			childScene.child_scene_settings.child_scene_id = child_scene_asset_id.toString();
@@ -241,6 +240,9 @@ as;;kljdalskfjdk
 
 			section.layer_id = childScene.uid;
 			output.material_design_settings.sections.add(section);
+		} else {
+			final PSDLayer content = child.findChildByNamePrefix(TAGS.CONTENT);
+
 		}
 
 	}
