@@ -25,6 +25,14 @@ public class TAGS {
 	public static final String SIZE = "@size=";
 	public static final String COLOR = "@color=";
 
+	public static final String LEFT_BUTTON = "@left_button";
+
+	public static final String STRINGS = "@strings";
+
+	public static final String HEIGHT = "@height=";
+
+	public static final String DRAWER = "@drawer";
+
 	public static final String PARALLAX_SETTINGS = "@parallax_settings";
 
 	public static final String PARALLAX_MULTIPLIER_X = "@mX=";
@@ -42,6 +50,8 @@ public class TAGS {
 	public static final String TEXT = "@text";
 	public static final String R3_SHADER = "@r3.shader";
 	public static final String FONT = "@font";
+
+	public static final String NAMESPACE = "@namespace";
 
 	public static final String AREA = "@area";
 	public static final String MODE = "@mode=";
@@ -69,5 +79,8 @@ public class TAGS {
 	public static final String VALUE_SWITCH = "switch";
 	public static final String VALUE_CUSTOM = "custom";
 	public static final String VALUE_TOUCH = "touch-area";
+	public static final String TOP_BAR = "@top_bar";
+	public static final String ICON = "@icon";
+	public static final String SECTIONS = "@sections";
 
 }

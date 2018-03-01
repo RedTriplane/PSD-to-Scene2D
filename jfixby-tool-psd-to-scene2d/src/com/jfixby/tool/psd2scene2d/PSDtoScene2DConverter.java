@@ -15,8 +15,13 @@ import com.jfixby.r3.io.scene2d.AnimationSettings;
 import com.jfixby.r3.io.scene2d.CameraSettings;
 import com.jfixby.r3.io.scene2d.CameraSettings.MODE;
 import com.jfixby.r3.io.scene2d.ChildSceneSettings;
+import com.jfixby.r3.io.scene2d.DrawerIcon;
+import com.jfixby.r3.io.scene2d.DrawerTopBarSettings;
+import com.jfixby.r3.io.scene2d.FontSettings;
 import com.jfixby.r3.io.scene2d.InputSettings;
 import com.jfixby.r3.io.scene2d.LayerElement;
+import com.jfixby.r3.io.scene2d.MaterialDesignSettings;
+import com.jfixby.r3.io.scene2d.MaterialDesignStrings;
 import com.jfixby.r3.io.scene2d.NinePatchSettings;
 import com.jfixby.r3.io.scene2d.ParallaxSettings;
 import com.jfixby.r3.io.scene2d.ProgressSettings;
@@ -59,6 +64,8 @@ public class PSDtoScene2DConverter {
 			final PSDLayer progress = input.findChildByNamePrefix(TAGS.PROGRESS);
 			final PSDLayer parallax = input.findChildByNamePrefix(TAGS.PARALLAX);
 			final PSDLayer ninePatch = input.findChildByNamePrefix(TAGS.NINE_PATCH);
+			final PSDLayer drawer = input.findChildByNamePrefix(TAGS.DRAWER);
+
 			// PSDLayer events_node = input.findChild(EVENT);
 			if (animation_node != null) {
 				if (input.numberOfChildren() != 1) {
@@ -90,6 +97,11 @@ public class PSDtoScene2DConverter {
 					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
 				PSDtoScene2DConverter.convertInput(stack, input, output, settings);
+			} else if (drawer != null) {
+				if (input.numberOfChildren() != 1) {
+					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
+				}
+				PSDtoScene2DConverter.convertDrawer(stack, input, output, settings);
 			} else if (progress != null) {
 				if (input.numberOfChildren() != 1) {
 					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
@@ -120,6 +132,105 @@ public class PSDtoScene2DConverter {
 			PSDtoScene2DConverter.convertRaster(input, output, settings);
 		}
 
+	}
+
+	private static void convertDrawer (final LayersStack stack, final PSDLayer input, final LayerElement output,
+		final ConvertionSettings settings) {
+
+		output.is_hidden = !input.isVisible();
+		output.name = input.getName();
+
+		if (output.name.startsWith("@")) {
+			Err.reportError("Bad layer name: " + output.name);
+		}
+
+		output.is_material_design = true;
+
+		output.material_design_settings = new MaterialDesignSettings();
+
+		output.material_design_settings.is_drawer = true;
+
+		final PSDLayer drawer = input.getChild(0);
+
+		final PSDLayer strings = drawer.findChildByName(TAGS.STRINGS);
+
+		{
+			final PSDLayer font_node = strings.findChildByName(TAGS.FONT);
+			final PSDLayer namespace = strings.findChildByNamePrefix(TAGS.NAMESPACE);
+
+			if (namespace != null) {
+				final String string = readStrings(namespace);
+				output.material_design_settings.strings = new MaterialDesignStrings();
+				output.material_design_settings.strings.namespace = Names.newID(string).toString();
+			}
+// output.material_design_settings.strings.font_settings.name
+			readFont(font_node, output.material_design_settings.strings.font_settings, settings);
+		}
+		{
+			final PSDLayer bg = drawer.findChildByName(TAGS.BACKGROUND);
+			final PSDLayer bgraster = bg.getChild(0);
+
+			final LayerElement rasterNode = settings.newLayerElement();
+			output.material_design_settings.background = rasterNode;
+
+			convertRaster(bgraster, rasterNode, settings);
+		}
+		{
+			final PSDLayer topbar = drawer.findChildByName(TAGS.TOP_BAR);
+			output.material_design_settings.top_bar = new DrawerTopBarSettings();
+			{
+				final String raw = findAndReadParameter(topbar, TAGS.HEIGHT);
+
+				output.material_design_settings.top_bar.height = Integer.parseInt(raw);
+
+				final PSDLayer bg = topbar.findChildByName(TAGS.BACKGROUND);
+				final PSDLayer bgraster = bg.getChild(0);
+
+				final LayerElement rasterNode = settings.newLayerElement();
+				output.material_design_settings.top_bar.background = rasterNode;
+
+				convertRaster(bgraster, rasterNode, settings);
+			}
+			{
+				final PSDLayer lbtn = topbar.findChildByName(TAGS.LEFT_BUTTON);
+				final PSDLayer icn = lbtn.findChildByName(TAGS.ICON);
+				final PSDLayer bgr = icn.getChild(0);
+
+				final LayerElement rasterNode = settings.newLayerElement();
+				output.material_design_settings.top_bar.left_icon = new DrawerIcon();
+				output.material_design_settings.top_bar.left_icon.background = rasterNode;
+
+				convertRaster(bgr, rasterNode, settings);
+
+			}
+
+		}
+		{
+			final PSDLayer sex = drawer.findChildByNamePrefix(TAGS.SECTIONS);
+			for (int i = 0; i < sex.numberOfChildren(); i++) {
+				final PSDLayer child = sex.getChild(i);
+				readSection(stack, child, output, settings);
+			}
+		}
+	}
+
+	private static void readSection (final LayersStack stack, final PSDLayer child, final LayerElement output,
+		final ConvertionSettings settings) {
+		final String name = child.getName();
+		final PSDLayer content_node = child.findChildByNamePrefix(TAGS.CONTENT);
+		final LayerElement folder = settings.newLayerElement();
+		folder.name = name;
+		final SceneStructure structure = settings.getStructure();
+		output.children.addElement(folder, structure);
+
+		convertFolder(stack, content_node, folder, settings);
+
+	}
+
+	private static String findAndReadParameter (final PSDLayer parent, final String prefix) {
+		final PSDLayer child = parent.findChildByNamePrefix(prefix);
+		final String param = readParameter(child, prefix);
+		return param;
 	}
 
 	public static ConversionResult convert (final Scene2DPackage container, final ID package_prefix, final PSDLayer root,
@@ -939,9 +1050,26 @@ public class PSDtoScene2DConverter {
 // result.addRequiredRaster(child_scene_asset_id, JUtils.newList(input_parent, input, background));
 			}
 		}
+		final PSDLayer font_node = input.findChildByNamePrefix(TAGS.FONT);
+
+		readFont(font_node, output.text_settings.font_settings, settings);
+
+		final PSDLayer padding = input.findChildByNamePrefix(TAGS.PADDING);
+		if (padding != null) {
+			String padding_string = PSDtoScene2DConverter.readParameter(padding.getName(), TAGS.PADDING);
+			padding_string = padding_string.substring(0, padding_string.indexOf("pix"));
+
+			final double scale_factor = settings.getScaleFactor();
+
+			output.text_settings.padding = (float)(Float.parseFloat(padding_string) * scale_factor);
+		}
+
+	}
+
+	private static void readFont (final PSDLayer font_node, final FontSettings font_settings, final ConvertionSettings settings) {
+
 		final double scale_factor = settings.getScaleFactor();
 		{
-			final PSDLayer font_node = input.findChildByNamePrefix(TAGS.FONT);
 			if (font_node != null) {
 				{
 					final PSDLayer size = PSDtoScene2DConverter.findChild(TAGS.SIZE, font_node);
@@ -949,9 +1077,9 @@ public class PSDtoScene2DConverter {
 						Err.reportError("Missing tag <@" + TAGS.SIZE + ">");
 					} else {
 						final String font_size_string = PSDtoScene2DConverter.readParameter(size.getName(), TAGS.SIZE);
-						output.text_settings.font_settings.font_size = (float)(Float.parseFloat(font_size_string) * scale_factor);
+						font_settings.font_size = (float)(Float.parseFloat(font_size_string) * scale_factor);
 // output.text_settings.font_settings.font_scale = (float)scale_factor;
-						output.text_settings.font_settings.value_is_in_pixels = true;
+						font_settings.value_is_in_pixels = true;
 					}
 				}
 				{
@@ -960,7 +1088,7 @@ public class PSDtoScene2DConverter {
 						Err.reportError("Missing tag <" + TAGS.COLOR + ">");
 					} else {
 						final String font_color_string = PSDtoScene2DConverter.readParameter(color.getName(), TAGS.COLOR);
-						output.text_settings.font_settings.font_color = "#" + Colors.newColor(font_color_string).toFullHexString();
+						font_settings.font_color = "#" + Colors.newColor(font_color_string).toFullHexString();
 					}
 				}
 				// AssetID child_scene_asset_id = null;
@@ -970,16 +1098,13 @@ public class PSDtoScene2DConverter {
 			final PSDLayer font_name = font_node.findChildByNamePrefix(TAGS.NAME);
 			if (font_name != null) {
 				final String font_name_string = PSDtoScene2DConverter.readParameter(font_name.getName(), TAGS.NAME);
-				output.text_settings.font_settings.name = font_name_string;
+				font_settings.name = font_name_string;
+
 				final SceneStructurePackingResult result = settings.getResult();
-				result.addRequiredAsset(Names.newID(font_name_string), Collections.newList(input));
+				result.addRequiredAsset(Names.newID(font_settings.name), Collections.newList(font_node));
+
 			}
-			final PSDLayer padding = input.findChildByNamePrefix(TAGS.PADDING);
-			if (padding != null) {
-				String padding_string = PSDtoScene2DConverter.readParameter(padding.getName(), TAGS.PADDING);
-				padding_string = padding_string.substring(0, padding_string.indexOf("pix"));
-				output.text_settings.padding = (float)(Float.parseFloat(padding_string) * scale_factor);
-			}
+
 		}
 	}
 
