@@ -22,6 +22,7 @@ import com.jfixby.r3.io.scene2d.InputSettings;
 import com.jfixby.r3.io.scene2d.LayerElement;
 import com.jfixby.r3.io.scene2d.MaterialDesignSettings;
 import com.jfixby.r3.io.scene2d.MaterialDesignStrings;
+import com.jfixby.r3.io.scene2d.MaterialDesingSection;
 import com.jfixby.r3.io.scene2d.NinePatchSettings;
 import com.jfixby.r3.io.scene2d.ParallaxSettings;
 import com.jfixby.r3.io.scene2d.ProgressSettings;
@@ -217,13 +218,30 @@ public class PSDtoScene2DConverter {
 	private static void readSection (final LayersStack stack, final PSDLayer child, final LayerElement output,
 		final ConvertionSettings settings) {
 		final String name = child.getName();
-		final PSDLayer content_node = child.findChildByNamePrefix(TAGS.CONTENT);
-		final LayerElement folder = settings.newLayerElement();
-		folder.name = name;
-		final SceneStructure structure = settings.getStructure();
-		output.children.addElement(folder, structure);
+		final LayerElement childScene = settings.newLayerElement();
+		childScene.name = name;
+		childScene.is_child_scene = true;
 
-		convertFolder(stack, content_node, folder, settings);
+		final SceneStructure structure = settings.getStructure();
+		output.children.addElement(childScene, structure);
+		childScene.child_scene_settings = new ChildSceneSettings();
+
+		final PSDLayer child_scene_node = child.findChildByNamePrefix(TAGS.CHILD_SCENE);
+		if (child_scene_node == null) {
+			final String child_id = PSDtoScene2DConverter.findAndReadParameter(child_scene_node, TAGS.ID);
+as;;kljdalskfjdk
+			final ID child_scene_asset_id = Names.newID(child_id);
+
+			childScene.child_scene_settings.child_scene_id = child_scene_asset_id.toString();
+
+			final SceneStructurePackingResult result = settings.getResult();
+			result.addRequiredAsset(child_scene_asset_id, Collections.newList(child));
+
+			final MaterialDesingSection section = new MaterialDesingSection();
+
+			section.layer_id = childScene.uid;
+			output.material_design_settings.sections.add(section);
+		}
 
 	}
 
