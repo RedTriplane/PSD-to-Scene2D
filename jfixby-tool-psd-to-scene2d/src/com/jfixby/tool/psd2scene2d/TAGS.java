@@ -20,6 +20,8 @@ public class TAGS {
 	public static final String USE_SPLINE = "@use_spline=";
 	public static final String DEBUG = "@debug=";
 	public static final String AUTOSTART = "@autostart=";
+	public static final String BUTTONS_LIST = "@buttons_list";
+
 	public static final String ID = "@id=";
 // public static final String STRING = "@string";
 	public static final String SIZE = "@size=";
@@ -82,5 +84,8 @@ public class TAGS {
 	public static final String TOP_BAR = "@top_bar";
 	public static final String ICON = "@icon";
 	public static final String SECTIONS = "@sections";
+
+	public static final String ITEM = "@item";
+	public static final String NEW_ITEM = "@new_item";
 
 }

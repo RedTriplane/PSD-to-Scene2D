@@ -20,6 +20,7 @@ import com.jfixby.r3.io.scene2d.DrawerTopBarSettings;
 import com.jfixby.r3.io.scene2d.FontSettings;
 import com.jfixby.r3.io.scene2d.InputSettings;
 import com.jfixby.r3.io.scene2d.LayerElement;
+import com.jfixby.r3.io.scene2d.ListItem;
 import com.jfixby.r3.io.scene2d.MaterialDesignSettings;
 import com.jfixby.r3.io.scene2d.MaterialDesignStrings;
 import com.jfixby.r3.io.scene2d.MaterialDesingSection;
@@ -66,6 +67,7 @@ public class PSDtoScene2DConverter {
 			final PSDLayer parallax = input.findChildByNamePrefix(TAGS.PARALLAX);
 			final PSDLayer ninePatch = input.findChildByNamePrefix(TAGS.NINE_PATCH);
 			final PSDLayer drawer = input.findChildByNamePrefix(TAGS.DRAWER);
+			final PSDLayer buttons_list = input.findChildByNamePrefix(TAGS.BUTTONS_LIST);
 
 			// PSDLayer events_node = input.findChild(EVENT);
 			if (animation_node != null) {
@@ -103,6 +105,11 @@ public class PSDtoScene2DConverter {
 					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
 				}
 				PSDtoScene2DConverter.convertDrawer(stack, input, output, settings);
+			} else if (buttons_list != null) {
+				if (input.numberOfChildren() != 1) {
+					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
+				}
+				PSDtoScene2DConverter.convertItemsList(stack, input, output, settings);
 			} else if (progress != null) {
 				if (input.numberOfChildren() != 1) {
 					Err.reportError("Annotation problem (only one child allowed). This is not an child scene node: " + input);
@@ -213,6 +220,107 @@ public class PSDtoScene2DConverter {
 				readSection(stack, child, output, settings);
 			}
 		}
+	}
+
+	private static void convertItemsList (final LayersStack stack, final PSDLayer input, final LayerElement output,
+		final ConvertionSettings settings) {
+
+		output.is_hidden = !input.isVisible();
+		output.name = input.getName();
+
+		if (output.name.startsWith("@")) {
+			Err.reportError("Bad layer name: " + output.name);
+		}
+
+		output.is_material_design = true;
+
+		output.material_design_settings = new MaterialDesignSettings();
+
+		output.material_design_settings.is_buttons_list = true;
+
+		final PSDLayer list = input.getChild(0);
+
+		{
+			final ListItem item = new ListItem();
+			final PSDLayer item_node = list.findChildByName(TAGS.ITEM);
+
+			output.material_design_settings.list_item = item;
+
+			final PSDLayer raster_node = item_node.findChildByNamePrefix(TAGS.RASTER);
+
+			final PSDLayer bgraster = raster_node.getChild(0);
+			final LayerElement rasterNode = settings.newLayerElement();
+			convertRaster(bgraster, rasterNode, settings);
+
+			item.raster = rasterNode;
+
+			final LayerElement areaNode = settings.newLayerElement();
+
+			item.area = areaNode;
+
+			final InputSettings input_settings = new InputSettings();
+			areaNode.input_settings = input_settings;
+
+			readArea(item_node, settings, areaNode);
+		}
+		{
+			final ListItem item = new ListItem();
+			final PSDLayer item_node = list.findChildByName(TAGS.NEW_ITEM);
+
+			output.material_design_settings.new_list_item = item;
+
+			final PSDLayer raster_node = item_node.findChildByNamePrefix(TAGS.RASTER);
+
+			final PSDLayer bgraster = raster_node.getChild(0);
+			final LayerElement rasterNode = settings.newLayerElement();
+			convertRaster(bgraster, rasterNode, settings);
+
+			item.raster = rasterNode;
+
+			final LayerElement areaNode = settings.newLayerElement();
+
+			item.area = areaNode;
+
+			final InputSettings input_settings = new InputSettings();
+			areaNode.input_settings = input_settings;
+
+			readArea(item_node, settings, areaNode);
+		}
+	}
+
+	private static void readArea (final PSDLayer input, final ConvertionSettings settings, final LayerElement output) {
+
+		final double scale_factor = settings.getScaleFactor();
+
+		final PSDLayer touch_area = PSDtoScene2DConverter.findChild(TAGS.AREA, input);
+		{
+			final LayerElement touch_areas = settings.newLayerElement();
+			output.input_settings.touch_area = touch_areas;
+
+			for (int i = 0; i < touch_area.numberOfChildren(); i++) {
+				final PSDLayer child = touch_area.getChild(i);
+				if (child.isFolder()) {
+					Err.reportError("Touch area has no dimentions: " + child);
+				} else {
+					final PSDRaster raster = child.getRaster();
+					Debug.checkNull("raster", raster);
+
+					final LayerElement area = settings.newLayerElement();
+
+					final SceneStructure structure = settings.getStructure();
+					touch_areas.children.addElement(area, structure);
+
+					area.position_x = (raster.getPosition().getX() * scale_factor);
+					area.position_y = (raster.getPosition().getY() * scale_factor);
+					area.width = raster.getDimentions().getWidth() * scale_factor;
+					area.height = raster.getDimentions().getHeight() * scale_factor;
+					area.name = child.getName();
+
+				}
+
+			}
+		}
+
 	}
 
 	private static void readSection (final LayersStack stack, final PSDLayer child, final LayerElement output,
@@ -717,41 +825,45 @@ public class PSDtoScene2DConverter {
 		}
 
 		{
+
 			final PSDLayer touch_area = PSDtoScene2DConverter.findChild(TAGS.AREA, input);
 			// output.input_settings.areas = new Vector<TouchArea>();
 			if (touch_area != null) {
-				final LayerElement touch_areas = settings.newLayerElement();
-				;
-				output.input_settings.touch_area = touch_areas;
 
-				for (int i = 0; i < touch_area.numberOfChildren(); i++) {
-					final PSDLayer child = touch_area.getChild(i);
-					if (child.isFolder()) {
-						Err.reportError("Touch area has no dimentions: " + child);
-					} else {
-						final PSDRaster raster = child.getRaster();
-						Debug.checkNull("raster", raster);
+				readArea(input, settings, output);
 
-						final LayerElement area = settings.newLayerElement();
-						;
-						final SceneStructure structure = settings.getStructure();
-						touch_areas.children.addElement(area, structure);
-						area.position_x = (raster.getPosition().getX() * scale_factor) - origin.getX();
-						area.position_y = (raster.getPosition().getY() * scale_factor) - origin.getY();
-						area.width = raster.getDimentions().getWidth() * scale_factor;
-						area.height = raster.getDimentions().getHeight() * scale_factor;
-						area.name = child.getName();
-
-						// TouchArea area = new TouchArea();
-						// area.position_x = raster.getPosition().getX();
-						// area.position_y = raster.getPosition().getY();
-						// area.width = raster.getDimentions().getWidth();
-						// area.height = raster.getDimentions().getHeight();
-						//
-						// output.input_settings.areas.add(area);
-					}
-
-				}
+// final LayerElement touch_areas = settings.newLayerElement();
+// ;
+// output.input_settings.touch_area = touch_areas;
+//
+// for (int i = 0; i < touch_area.numberOfChildren(); i++) {
+// final PSDLayer child = touch_area.getChild(i);
+// if (child.isFolder()) {
+// Err.reportError("Touch area has no dimentions: " + child);
+// } else {
+// final PSDRaster raster = child.getRaster();
+// Debug.checkNull("raster", raster);
+//
+// final LayerElement area = settings.newLayerElement();
+// ;
+// final SceneStructure structure = settings.getStructure();
+// touch_areas.children.addElement(area, structure);
+// area.position_x = (raster.getPosition().getX() * scale_factor) - origin.getX();
+// area.position_y = (raster.getPosition().getY() * scale_factor) - origin.getY();
+// area.width = raster.getDimentions().getWidth() * scale_factor;
+// area.height = raster.getDimentions().getHeight() * scale_factor;
+// area.name = child.getName();
+//
+// // TouchArea area = new TouchArea();
+// // area.position_x = raster.getPosition().getX();
+// // area.position_y = raster.getPosition().getY();
+// // area.width = raster.getDimentions().getWidth();
+// // area.height = raster.getDimentions().getHeight();
+// //
+// // output.input_settings.areas.add(area);
+// }
+//
+// }
 			}
 
 		}
