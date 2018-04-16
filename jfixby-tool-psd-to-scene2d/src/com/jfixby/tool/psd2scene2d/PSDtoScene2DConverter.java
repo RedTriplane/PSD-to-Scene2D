@@ -8,32 +8,32 @@ import com.jfixby.psd.unpacker.api.PSDRaster;
 import com.jfixby.psd.unpacker.api.PSDRasterDimentions;
 import com.jfixby.psd.unpacker.api.PSDRasterPosition;
 import com.jfixby.r3.fokker.assets.api.shader.io.SHADER_PARAMETER;
-import com.jfixby.r3.io.scene2d.Action;
-import com.jfixby.r3.io.scene2d.ActionsGroup;
-import com.jfixby.r3.io.scene2d.Anchor;
-import com.jfixby.r3.io.scene2d.AnimationSettings;
-import com.jfixby.r3.io.scene2d.CameraSettings;
-import com.jfixby.r3.io.scene2d.CameraSettings.MODE;
-import com.jfixby.r3.io.scene2d.ChildSceneSettings;
-import com.jfixby.r3.io.scene2d.DrawerIcon;
-import com.jfixby.r3.io.scene2d.DrawerTopBarSettings;
-import com.jfixby.r3.io.scene2d.FontSettings;
-import com.jfixby.r3.io.scene2d.InputSettings;
-import com.jfixby.r3.io.scene2d.LayerElement;
-import com.jfixby.r3.io.scene2d.ListItem;
-import com.jfixby.r3.io.scene2d.MaterialDesignSettings;
-import com.jfixby.r3.io.scene2d.MaterialDesignStrings;
-import com.jfixby.r3.io.scene2d.MaterialDesingSection;
-import com.jfixby.r3.io.scene2d.NinePatchSettings;
-import com.jfixby.r3.io.scene2d.ParallaxSettings;
-import com.jfixby.r3.io.scene2d.ProgressSettings;
-import com.jfixby.r3.io.scene2d.RASTER_BLEND_MODE;
-import com.jfixby.r3.io.scene2d.Scene2DPackage;
-import com.jfixby.r3.io.scene2d.SceneStructure;
-import com.jfixby.r3.io.scene2d.ShaderParameterType;
-import com.jfixby.r3.io.scene2d.ShaderParameterValue;
-import com.jfixby.r3.io.scene2d.ShaderSettings;
-import com.jfixby.r3.io.scene2d.TextSettings;
+import com.jfixby.r3.scene2d.io.Action;
+import com.jfixby.r3.scene2d.io.ActionsGroup;
+import com.jfixby.r3.scene2d.io.Anchor;
+import com.jfixby.r3.scene2d.io.AnimationSettings;
+import com.jfixby.r3.scene2d.io.CameraSettings;
+import com.jfixby.r3.scene2d.io.CameraSettings.MODE;
+import com.jfixby.r3.scene2d.io.ChildSceneSettings;
+import com.jfixby.r3.scene2d.io.DrawerIcon;
+import com.jfixby.r3.scene2d.io.DrawerTopBarSettings;
+import com.jfixby.r3.scene2d.io.FontSettings;
+import com.jfixby.r3.scene2d.io.InputSettings;
+import com.jfixby.r3.scene2d.io.LayerElement;
+import com.jfixby.r3.scene2d.io.ListItem;
+import com.jfixby.r3.scene2d.io.MaterialDesignSettings;
+import com.jfixby.r3.scene2d.io.MaterialDesignStrings;
+import com.jfixby.r3.scene2d.io.MaterialDesingSection;
+import com.jfixby.r3.scene2d.io.NinePatchSettings;
+import com.jfixby.r3.scene2d.io.ParallaxSettings;
+import com.jfixby.r3.scene2d.io.ProgressSettings;
+import com.jfixby.r3.scene2d.io.RASTER_BLEND_MODE;
+import com.jfixby.r3.scene2d.io.Scene2DPackage;
+import com.jfixby.r3.scene2d.io.SceneStructure;
+import com.jfixby.r3.scene2d.io.ShaderParameterType;
+import com.jfixby.r3.scene2d.io.ShaderParameterValue;
+import com.jfixby.r3.scene2d.io.ShaderSettings;
+import com.jfixby.r3.scene2d.io.TextSettings;
 import com.jfixby.scarabei.api.collections.Collections;
 import com.jfixby.scarabei.api.collections.List;
 import com.jfixby.scarabei.api.collections.Map;
@@ -224,7 +224,9 @@ public class PSDtoScene2DConverter {
 
 	private static void convertItemsList (final LayersStack stack, final PSDLayer input, final LayerElement output,
 		final ConvertionSettings settings) {
-
+		if (1 == 1) {
+			return;
+		}
 		output.is_hidden = !input.isVisible();
 		output.name = input.getName();
 
@@ -254,14 +256,16 @@ public class PSDtoScene2DConverter {
 
 			item.raster = rasterNode;
 
-			final LayerElement areaNode = settings.newLayerElement();
+			final double scale_factor = settings.getScaleFactor();
 
-			item.area = areaNode;
+			final PSDLayer touch_area = PSDtoScene2DConverter.findChild(TAGS.AREA, input);
+			final PSDRaster raster = touch_area.getRaster();
 
-			final InputSettings input_settings = new InputSettings();
-			areaNode.input_settings = input_settings;
+			item.offset_x = (raster.getPosition().getX() * scale_factor);
+			item.offset_y = (raster.getPosition().getY() * scale_factor);
+			item.item_width = raster.getDimentions().getWidth() * scale_factor;
+			item.item_height = raster.getDimentions().getHeight() * scale_factor;
 
-			readArea(item_node, settings, areaNode);
 		}
 		{
 			final ListItem item = new ListItem();
@@ -277,14 +281,15 @@ public class PSDtoScene2DConverter {
 
 			item.raster = rasterNode;
 
-			final LayerElement areaNode = settings.newLayerElement();
+			final double scale_factor = settings.getScaleFactor();
 
-			item.area = areaNode;
+			final PSDLayer touch_area = PSDtoScene2DConverter.findChild(TAGS.AREA, input);
+			final PSDRaster raster = touch_area.getRaster();
 
-			final InputSettings input_settings = new InputSettings();
-			areaNode.input_settings = input_settings;
-
-			readArea(item_node, settings, areaNode);
+			item.offset_x = (raster.getPosition().getX() * scale_factor);
+			item.offset_y = (raster.getPosition().getY() * scale_factor);
+			item.item_width = raster.getDimentions().getWidth() * scale_factor;
+			item.item_height = raster.getDimentions().getHeight() * scale_factor;
 		}
 	}
 
@@ -330,8 +335,6 @@ public class PSDtoScene2DConverter {
 		childScene.name = name;
 		childScene.is_child_scene = true;
 
-		final SceneStructure structure = settings.getStructure();
-		output.children.addElement(childScene, structure);
 		childScene.child_scene_settings = new ChildSceneSettings();
 
 		final PSDLayer child_scene_node = child.findChildByNamePrefix(TAGS.CHILD_SCENE);
@@ -346,7 +349,7 @@ public class PSDtoScene2DConverter {
 
 			final MaterialDesingSection section = new MaterialDesingSection();
 
-			section.layer_id = childScene.uid;
+			section.layer = childScene;
 			output.material_design_settings.sections.add(section);
 		} else {
 			final PSDLayer content = child.findChildByNamePrefix(TAGS.CONTENT);
